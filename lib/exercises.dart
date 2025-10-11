@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mindfulness_app/data.dart';
+import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
 class ExercisesPage extends StatefulWidget {
   const ExercisesPage({super.key});
@@ -11,13 +12,23 @@ class ExercisesPage extends StatefulWidget {
 class _ExercisesPageState extends State<ExercisesPage>
     with TickerProviderStateMixin {
   Map<String, String>? _selectedItem;
+  bool _videoSelected = false;
   bool _textSelected = false;
+  final _playController = YoutubePlayerController();
   late TabController _nestedConrtoller;
+
+  void _selectVideo(item) {
+    setState(() {
+      _selectedItem = item;
+      _videoSelected = true;
+      _playController.loadVideoById(videoId: item['videoId']);
+    });
+  }
 
   void _selectText(item) {
     setState(() {
-      _textSelected = true;
       _selectedItem = item;
+      _textSelected = true;
     });
   }
 
@@ -40,7 +51,9 @@ class _ExercisesPageState extends State<ExercisesPage>
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
-        _textSelected
+        _videoSelected
+            ? YoutubePlayer(controller: _playController)
+            : _textSelected
             ? SizedBox(
                 height: screenHeight * 0.25,
                 child: SingleChildScrollView(
@@ -60,8 +73,10 @@ class _ExercisesPageState extends State<ExercisesPage>
               )
             : Image.asset(
                 'assets/images/mindful.jpg',
-                height: screenHeight * 0.25,
                 fit: BoxFit.cover,
+                height: screenHeight * 0.25,
+                width: MediaQuery.of(context).size.width,
+                alignment: AlignmentGeometry.topCenter,
               ),
         TabBar(
           controller: _nestedConrtoller,
@@ -80,6 +95,12 @@ class _ExercisesPageState extends State<ExercisesPage>
                   return ListTile(
                     title: Text(videoExercises[index]["title"]!),
                     trailing: Icon(Icons.play_circle_outline),
+                    onTap: () => _selectVideo(videoExercises[index]),
+                    selected: _textSelected
+                        ? videoExercises[index]['title'] ==
+                              _selectedItem!['title']
+                        : false,
+                    selectedTileColor: Colors.cyan,
                   );
                 },
               ),
