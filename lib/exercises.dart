@@ -99,7 +99,7 @@ class _ExercisesPageState extends State<ExercisesPage>
                     title: Text(videoExercises[index]["title"]!),
                     trailing: Icon(Icons.play_circle_outline),
                     onTap: () => _selectVideo(videoExercises[index]),
-                    selected: _textSelected
+                    selected: _videoSelected
                         ? videoExercises[index]['title'] ==
                               _selectedItem!['title']
                         : false,
@@ -107,20 +107,22 @@ class _ExercisesPageState extends State<ExercisesPage>
                   );
                 },
               ),
-              ListView.builder(
-                itemCount: textExercises.length,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text(textExercises[index]["title"]!),
-                    trailing: Icon(Icons.chevron_right),
-                    onTap: () => _selectText(textExercises[index]),
-                    selected: _textSelected
-                        ? textExercises[index]['title'] ==
-                              _selectedItem!['title']
-                        : false,
-                    selectedTileColor: Colors.cyan,
-                  );
-                },
+              Material(
+                child: ListView.builder(
+                  itemCount: textExercises.length,
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      title: Text(textExercises[index]["title"]!),
+                      trailing: Icon(Icons.chevron_right),
+                      onTap: () => _selectText(textExercises[index]),
+                      selected: _textSelected
+                          ? textExercises[index]['title'] ==
+                                _selectedItem!['title']
+                          : false,
+                      selectedTileColor: Colors.cyan,
+                    );
+                  },
+                ),
               ),
             ],
           ),
