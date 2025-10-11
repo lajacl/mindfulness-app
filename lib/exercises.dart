@@ -11,12 +11,12 @@ class ExercisesPage extends StatefulWidget {
 class _ExercisesPageState extends State<ExercisesPage>
     with TickerProviderStateMixin {
   Map<String, String>? _selectedItem;
-  bool _itemSelected = false;
+  bool _textSelected = false;
   late TabController _nestedConrtoller;
 
-  void _updateSelection(item) {
+  void _selectText(item) {
     setState(() {
-      _itemSelected = true;
+      _textSelected = true;
       _selectedItem = item;
     });
   }
@@ -40,7 +40,7 @@ class _ExercisesPageState extends State<ExercisesPage>
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
-        _itemSelected
+        _textSelected
             ? SizedBox(
                 height: screenHeight * 0.25,
                 child: SingleChildScrollView(
@@ -74,15 +74,23 @@ class _ExercisesPageState extends State<ExercisesPage>
           child: TabBarView(
             controller: _nestedConrtoller,
             children: [
-              Tab(icon: Icon(Icons.video_library), text: 'Video', height: 100),
+              ListView.builder(
+                itemCount: videoExercises.length,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    title: Text(videoExercises[index]["title"]!),
+                    trailing: Icon(Icons.play_circle_outline),
+                  );
+                },
+              ),
               ListView.builder(
                 itemCount: textExercises.length,
                 itemBuilder: (context, index) {
                   return ListTile(
                     title: Text(textExercises[index]["title"]!),
                     trailing: Icon(Icons.chevron_right),
-                    onTap: () => _updateSelection(textExercises[index]),
-                    selected: _itemSelected
+                    onTap: () => _selectText(textExercises[index]),
+                    selected: _textSelected
                         ? textExercises[index]['title'] ==
                               _selectedItem!['title']
                         : false,

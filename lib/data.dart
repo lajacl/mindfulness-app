@@ -1,3 +1,18 @@
+final List<Map<String, String>> videoExercises = [
+  {"title": "Be Present", "videoId": "ZToicYcHIOU"},
+  {"title": "Letting Go", "videoId": "syx3a1_LeFo"},
+  {"title": "Self Soothing", "videoId": "Xl_B45DpMLU"},
+  {"title": "Forgetting Time", "videoId": "YF_P1ZzYgjA"},
+  {"title": "Symphony", "videoId": "fkgzQsxdn9I"},
+  {"title": "Impermanence", "videoId": "uumInvT4t9Y"},
+  {"title": "Santosha", "videoId": "5vI8Kh3-epg"},
+  {"title": "Present", "videoId": "lVx3mFxML80"},
+  {"title": "Letting Go", "videoId": "syx3a1_LeFo"},
+  {"title": "A 5 Minute Mindfulness Meditation", "videoId": "wGFog-OuFDM"},
+  {"title": "Body Scan Exercise", "videoId": "15q-N-_kkrU"},
+  {"title": "Just Breathe", "videoId": "IyW4nwfwunw"},
+];
+
 final List<Map<String, String>> textExercises = [
   {
     "title": "Body Scan Meditation",
