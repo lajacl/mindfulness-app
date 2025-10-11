@@ -7,7 +7,6 @@ final List<Map<String, String>> videoExercises = [
   {"title": "Impermanence", "videoId": "uumInvT4t9Y"},
   {"title": "Santosha", "videoId": "5vI8Kh3-epg"},
   {"title": "Present", "videoId": "lVx3mFxML80"},
-  {"title": "Letting Go", "videoId": "syx3a1_LeFo"},
   {"title": "A 5 Minute Mindfulness Meditation", "videoId": "wGFog-OuFDM"},
   {"title": "Body Scan Exercise", "videoId": "15q-N-_kkrU"},
   {"title": "Just Breathe", "videoId": "IyW4nwfwunw"},
