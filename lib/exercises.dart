@@ -20,6 +20,7 @@ class _ExercisesPageState extends State<ExercisesPage>
   void _selectVideo(item) {
     setState(() {
       _selectedItem = item;
+      _textSelected = false;
       _videoSelected = true;
       _playController.loadVideoById(videoId: item['videoId']);
     });
@@ -28,6 +29,8 @@ class _ExercisesPageState extends State<ExercisesPage>
   void _selectText(item) {
     setState(() {
       _selectedItem = item;
+      _playController.stopVideo();
+      _videoSelected = false;
       _textSelected = true;
     });
   }
