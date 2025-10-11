@@ -49,7 +49,7 @@ class _ExercisesPageState extends State<ExercisesPage>
                     child: Column(
                       children: [
                         Text(
-                          '${_selectedItem!['title']!}\n',
+                          '${_selectedItem!['title']}\n',
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         Text(_selectedItem!['text']!),
@@ -82,6 +82,11 @@ class _ExercisesPageState extends State<ExercisesPage>
                     title: Text(textExercises[index]["title"]!),
                     trailing: Icon(Icons.chevron_right),
                     onTap: () => _updateSelection(textExercises[index]),
+                    selected: _itemSelected
+                        ? textExercises[index]['title'] ==
+                              _selectedItem!['title']
+                        : false,
+                    selectedTileColor: Colors.cyan,
                   );
                 },
               ),
