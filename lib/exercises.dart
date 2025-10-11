@@ -92,20 +92,22 @@ class _ExercisesPageState extends State<ExercisesPage>
           child: TabBarView(
             controller: _nestedConrtoller,
             children: [
-              ListView.builder(
-                itemCount: videoExercises.length,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text(videoExercises[index]["title"]!),
-                    trailing: Icon(Icons.play_circle_outline),
-                    onTap: () => _selectVideo(videoExercises[index]),
-                    selected: _videoSelected
-                        ? videoExercises[index]['title'] ==
-                              _selectedItem!['title']
-                        : false,
-                    selectedTileColor: Colors.cyan,
-                  );
-                },
+              Material(
+                child: ListView.builder(
+                  itemCount: videoExercises.length,
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      title: Text(videoExercises[index]["title"]!),
+                      trailing: Icon(Icons.play_circle_outline),
+                      onTap: () => _selectVideo(videoExercises[index]),
+                      selected: _videoSelected
+                          ? videoExercises[index]['title'] ==
+                                _selectedItem!['title']
+                          : false,
+                      selectedTileColor: Colors.cyan,
+                    );
+                  },
+                ),
               ),
               Material(
                 child: ListView.builder(
