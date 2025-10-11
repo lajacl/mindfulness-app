@@ -8,7 +8,6 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the Mindful of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -44,47 +43,73 @@ class _MindfulPageState extends State<MindfulPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 50, vertical: 10),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              Padding(
-                padding: EdgeInsets.all(20),
-                child: Text(
-                  _getDate(),
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
-                ),
-              ),
-              Container(
-                decoration: BoxDecoration(
-                  border: Border.all(),
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                ),
-                child: Padding(
-                  padding: EdgeInsets.all(20),
-                  child: Column(
-                    children: [
-                      Text(message['text']!, style: TextStyle(fontSize: 18)),
-                      Align(
-                        alignment: AlignmentGeometry.bottomRight,
-                        child: Text(
-                          message['verse']!,
-                          style: TextStyle(fontSize: 18),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+    return DefaultTabController(
+      length: 5,
+      child: Scaffold(
+        appBar: AppBar(
+          bottom: const TabBar(
+            tabs: [
+              Tab(icon: Icon(Icons.home)),
+              Tab(icon: Icon(Icons.psychology)),
+              Tab(icon: Icon(Icons.sentiment_very_satisfied)),
+              Tab(icon: Icon(Icons.edit_note)),
+              Tab(icon: Icon(Icons.music_note)),
             ],
           ),
+          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+          title: Text(widget.title),
+        ),
+        body: TabBarView(
+          children: [
+            Center(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 50, vertical: 10),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.all(20),
+                      child: Text(
+                        _getDate(),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 24,
+                        ),
+                      ),
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(),
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.all(20),
+                        child: Column(
+                          children: [
+                            Text(
+                              message['text']!,
+                              style: TextStyle(fontSize: 18),
+                            ),
+                            Align(
+                              alignment: AlignmentGeometry.bottomRight,
+                              child: Text(
+                                message['verse']!,
+                                style: TextStyle(fontSize: 18),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Tab(icon: Icon(Icons.psychology)),
+            Tab(icon: Icon(Icons.sentiment_very_satisfied)),
+            Tab(icon: Icon(Icons.edit_note)),
+            Tab(icon: Icon(Icons.music_note)),
+          ],
         ),
       ),
     );
