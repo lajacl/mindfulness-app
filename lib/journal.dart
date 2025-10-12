@@ -10,10 +10,33 @@ class JournalPage extends StatefulWidget {
 
 class _JournalPageState extends State<JournalPage> {
   late final TextEditingController _textController;
+  bool _isEditing = false;
+  bool _canSubmit = false;
 
   String _getDate() {
     DateTime datetime = DateTime.now();
     return DateFormat('MMMM d, yyyy').format(datetime);
+  }
+
+  void _saveEntry() {
+    setState(() {
+      if (_textController.text.trim().isEmpty) return;
+      _isEditing = false;
+    });
+  }
+
+  void _editEntry() {
+    setState(() {
+      _isEditing = true;
+    });
+  }
+
+  void _onTextChanged(value) {
+    if (_canSubmit != value.trim().isNotEmpty) {
+      setState(() {
+        _canSubmit = value.trim().isNotEmpty;
+      });
+    }
   }
 
   @override
@@ -35,10 +58,20 @@ class _JournalPageState extends State<JournalPage> {
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
             textAlign: TextAlign.center,
           ),
-          Text(
-            'Journal Entry:',
-            style: TextStyle(fontSize: 16),
-            textAlign: TextAlign.left,
+          SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Journal Entry:',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              if (_textController.text.isNotEmpty && !_isEditing)
+                IconButton(
+                  icon: Icon(Icons.edit),
+                  onPressed: () => _editEntry(),
+                ),
+            ],
           ),
           SizedBox(height: 10),
           Column(
@@ -59,14 +92,20 @@ class _JournalPageState extends State<JournalPage> {
                     style: TextStyle(color: Colors.black),
                     cursorColor: Colors.tealAccent,
                     backgroundCursorColor: Colors.grey,
+                    readOnly: _textController.text.isNotEmpty && !_isEditing,
+                    onChanged: (value) => _onTextChanged(value),
                   ),
                 ),
               ),
               SizedBox(height: 20),
-              Align(
-                alignment: AlignmentGeometry.bottomRight,
-                child: ElevatedButton(onPressed: null, child: Text('Save')),
-              ),
+              if (_textController.text.isEmpty || _isEditing)
+                Align(
+                  alignment: AlignmentGeometry.bottomRight,
+                  child: ElevatedButton(
+                    onPressed: _canSubmit ? () => _saveEntry() : null,
+                    child: Text('Save'),
+                  ),
+                ),
             ],
           ),
         ],
