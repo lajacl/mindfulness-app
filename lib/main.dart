@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mindfulness_app/home.dart';
 import 'package:mindfulness_app/exercises.dart';
+import 'package:mindfulness_app/journal.dart';
+import 'package:mindfulness_app/mood.dart';
 
 void main() {
   runApp(const MyApp());
@@ -53,9 +55,9 @@ class _MindfulPageState extends State<MindfulPage> {
           children: [
             HomePage(),
             ExercisesPage(),
-            Tab(icon: Icon(Icons.sentiment_very_satisfied)),
-            Tab(icon: Icon(Icons.edit_note)),
-            Tab(icon: Icon(Icons.music_note)),
+            MoodPage(),
+            JournalPage(),
+            Tab(icon: Icon(Icons.music_note, size: 200)),
           ],
         ),
       ),
