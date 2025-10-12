@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:mindfulness_app/data.dart';
 
 class MoodPage extends StatefulWidget {
   const MoodPage({super.key});
@@ -9,7 +10,7 @@ class MoodPage extends StatefulWidget {
 }
 
 class _MoodPageState extends State<MoodPage> {
-  String _mood = "";
+  Mood? _mood;
 
   String _getDate() {
     DateTime datetime = DateTime.now();
@@ -27,112 +28,49 @@ class _MoodPageState extends State<MoodPage> {
     double screenWidth = MediaQuery.of(context).size.width;
 
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+      padding: EdgeInsets.symmetric(horizontal: 25, vertical: 20),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
-          Padding(
-            padding: EdgeInsets.all(20),
-            child: Text(
-              _getDate(),
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
-            ),
+          Text(
+            _getDate(),
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
           ),
-          if (_mood == 'Good')
+          if (_mood == null)
             Column(
               children: [
-                IconButton(
-                  icon: Icon(
-                    Icons.sentiment_very_satisfied,
-                    size: screenWidth / 3,
-                  ),
-                  onPressed: () => _updateMood('Good'),
-                ),
-                TextButton.icon(
-                  label: Text('Good'),
-                  icon: Icon(Icons.edit),
-                  iconAlignment: IconAlignment.end,
-                  onPressed: () => _updateMood(''),
-                ),
-              ],
-            )
-          else if (_mood == 'Okay')
-            Column(
-              children: [
-                IconButton(
-                  icon: Icon(Icons.sentiment_neutral, size: screenWidth / 3),
-                  onPressed: () => _updateMood('Okay'),
-                ),
-                TextButton.icon(
-                  label: Text('Okay'),
-                  icon: Icon(Icons.edit),
-                  iconAlignment: IconAlignment.end,
-                  onPressed: () => _updateMood(''),
-                ),
-              ],
-            )
-          else if (_mood == 'Bad')
-            Column(
-              children: [
-                IconButton(
-                  icon: Icon(
-                    Icons.sentiment_very_dissatisfied,
-                    size: screenWidth / 3,
-                  ),
-                  onPressed: () => _updateMood('Bad'),
-                ),
-                TextButton.icon(
-                  label: Text('Bad'),
-                  icon: Icon(Icons.edit),
-                  iconAlignment: IconAlignment.end,
-                  onPressed: () => _updateMood(''),
+                Text('How are you?', style: TextStyle(fontSize: 20)),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: Mood.values.map((mood) {
+                    return Column(
+                      children: [
+                        IconButton(
+                          icon: Icon(
+                            Icons.sentiment_very_satisfied,
+                            size: screenWidth / (Mood.values.length + 1),
+                          ),
+                          onPressed: () => _updateMood(mood),
+                        ),
+                        Text(mood.label),
+                      ],
+                    );
+                  }).toList(),
                 ),
               ],
             )
           else
             Column(
               children: [
-                Text('How are you?', style: TextStyle(fontSize: 20)),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      children: [
-                        IconButton(
-                          icon: Icon(
-                            Icons.sentiment_very_satisfied,
-                            size: screenWidth / 4,
-                          ),
-                          onPressed: () => _updateMood('Good'),
-                        ),
-                        Text('Good'),
-                      ],
-                    ),
-                    Column(
-                      children: [
-                        IconButton(
-                          icon: Icon(
-                            Icons.sentiment_neutral,
-                            size: screenWidth / 4,
-                          ),
-                          onPressed: () => _updateMood('Okay'),
-                        ),
-                        Text('Okay'),
-                      ],
-                    ),
-                    Column(
-                      children: [
-                        IconButton(
-                          icon: Icon(
-                            Icons.sentiment_very_dissatisfied,
-                            size: screenWidth / 4,
-                          ),
-                          onPressed: () => _updateMood('Bad'),
-                        ),
-                        Text('Bad'),
-                      ],
-                    ),
-                  ],
+                IconButton(
+                  icon: Icon(_mood!.icon, size: screenWidth / 3),
+                  onPressed: () => _updateMood(null),
+                ),
+                TextButton.icon(
+                  label: Text(_mood!.label),
+                  icon: Icon(Icons.edit),
+                  iconAlignment: IconAlignment.end,
+                  onPressed: () => _updateMood(null),
                 ),
               ],
             ),
