@@ -48,7 +48,12 @@ class _MoodPageState extends State<MoodPage> {
                   ),
                   onPressed: () => _updateMood('Good'),
                 ),
-                Text('Good'),
+                TextButton.icon(
+                  label: Text('Good'),
+                  icon: Icon(Icons.edit),
+                  iconAlignment: IconAlignment.end,
+                  onPressed: () => _updateMood(''),
+                ),
               ],
             )
           else if (_mood == 'Okay')
@@ -58,7 +63,12 @@ class _MoodPageState extends State<MoodPage> {
                   icon: Icon(Icons.sentiment_neutral, size: screenWidth / 3),
                   onPressed: () => _updateMood('Okay'),
                 ),
-                Text('Okay'),
+                TextButton.icon(
+                  label: Text('Okay'),
+                  icon: Icon(Icons.edit),
+                  iconAlignment: IconAlignment.end,
+                  onPressed: () => _updateMood(''),
+                ),
               ],
             )
           else if (_mood == 'Bad')
@@ -71,17 +81,18 @@ class _MoodPageState extends State<MoodPage> {
                   ),
                   onPressed: () => _updateMood('Bad'),
                 ),
-                Text('Bad'),
+                TextButton.icon(
+                  label: Text('Bad'),
+                  icon: Icon(Icons.edit),
+                  iconAlignment: IconAlignment.end,
+                  onPressed: () => _updateMood(''),
+                ),
               ],
             )
           else
             Column(
               children: [
-                Text(
-                  'How are you?',
-                  style: TextStyle(fontSize: 20),
-                  textAlign: TextAlign.left,
-                ),
+                Text('How are you?', style: TextStyle(fontSize: 20)),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
