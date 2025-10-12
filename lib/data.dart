@@ -1,3 +1,6 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+
 final List<Map<String, String>> videoExercises = [
   {"title": "Be Present", "videoId": "ZToicYcHIOU"},
   {"title": "Letting Go", "videoId": "syx3a1_LeFo"},
@@ -103,3 +106,14 @@ final List<Map<String, String>> textExercises = [
         "When you are ready to finish the exercise, open your eyes slowly and try to carry that mindfulness with you as you go about your day.",
   },
 ];
+
+enum Mood {
+  good(label: 'Good', icon: Icons.sentiment_very_satisfied),
+  okay(label: 'Okay', icon: Icons.sentiment_very_satisfied),
+  bad(label: 'Bad', icon: Icons.sentiment_very_dissatisfied);
+
+  const Mood({required this.label, required this.icon});
+
+  final String label;
+  final IconData icon;
+}
