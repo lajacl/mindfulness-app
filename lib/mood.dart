@@ -9,9 +9,17 @@ class MoodPage extends StatefulWidget {
 }
 
 class _MoodPageState extends State<MoodPage> {
+  String _mood = "";
+
   String _getDate() {
     DateTime datetime = DateTime.now();
     return DateFormat('MMMM d, yyyy').format(datetime);
+  }
+
+  void _updateMood(mood) {
+    setState(() {
+      _mood = mood;
+    });
   }
 
   @override
@@ -30,49 +38,93 @@ class _MoodPageState extends State<MoodPage> {
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
             ),
           ),
-          Text(
-            'How are you?',
-            style: TextStyle(fontSize: 20),
-            textAlign: TextAlign.left,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                children: [
-                  IconButton(
-                    icon: Icon(
-                      Icons.sentiment_very_satisfied,
-                      size: screenWidth / 4,
+          if (_mood == 'Good')
+            Column(
+              children: [
+                IconButton(
+                  icon: Icon(
+                    Icons.sentiment_very_satisfied,
+                    size: screenWidth / 3,
+                  ),
+                  onPressed: () => _updateMood('Good'),
+                ),
+                Text('Good'),
+              ],
+            )
+          else if (_mood == 'Okay')
+            Column(
+              children: [
+                IconButton(
+                  icon: Icon(Icons.sentiment_neutral, size: screenWidth / 3),
+                  onPressed: () => _updateMood('Okay'),
+                ),
+                Text('Okay'),
+              ],
+            )
+          else if (_mood == 'Bad')
+            Column(
+              children: [
+                IconButton(
+                  icon: Icon(
+                    Icons.sentiment_very_dissatisfied,
+                    size: screenWidth / 3,
+                  ),
+                  onPressed: () => _updateMood('Bad'),
+                ),
+                Text('Bad'),
+              ],
+            )
+          else
+            Column(
+              children: [
+                Text(
+                  'How are you?',
+                  style: TextStyle(fontSize: 20),
+                  textAlign: TextAlign.left,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      children: [
+                        IconButton(
+                          icon: Icon(
+                            Icons.sentiment_very_satisfied,
+                            size: screenWidth / 4,
+                          ),
+                          onPressed: () => _updateMood('Good'),
+                        ),
+                        Text('Good'),
+                      ],
                     ),
-                    onPressed: null,
-                  ),
-                  Text('Good'),
-                ],
-              ),
-              Column(
-                children: [
-                  IconButton(
-                    icon: Icon(Icons.sentiment_neutral, size: screenWidth / 4),
-                    onPressed: null,
-                  ),
-                  Text('Okay'),
-                ],
-              ),
-              Column(
-                children: [
-                  IconButton(
-                    icon: Icon(
-                      Icons.sentiment_very_dissatisfied,
-                      size: screenWidth / 4,
+                    Column(
+                      children: [
+                        IconButton(
+                          icon: Icon(
+                            Icons.sentiment_neutral,
+                            size: screenWidth / 4,
+                          ),
+                          onPressed: () => _updateMood('Okay'),
+                        ),
+                        Text('Okay'),
+                      ],
                     ),
-                    onPressed: null,
-                  ),
-                  Text('Bad'),
-                ],
-              ),
-            ],
-          ),
+                    Column(
+                      children: [
+                        IconButton(
+                          icon: Icon(
+                            Icons.sentiment_very_dissatisfied,
+                            size: screenWidth / 4,
+                          ),
+                          onPressed: () => _updateMood('Bad'),
+                        ),
+                        Text('Bad'),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
         ],
       ),
     );
