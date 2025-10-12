@@ -9,9 +9,17 @@ class JournalPage extends StatefulWidget {
 }
 
 class _JournalPageState extends State<JournalPage> {
+  late final TextEditingController _textController;
+
   String _getDate() {
     DateTime datetime = DateTime.now();
     return DateFormat('MMMM d, yyyy').format(datetime);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _textController = TextEditingController();
   }
 
   @override
@@ -31,6 +39,35 @@ class _JournalPageState extends State<JournalPage> {
             'Journal Entry:',
             style: TextStyle(fontSize: 16),
             textAlign: TextAlign.left,
+          ),
+          SizedBox(height: 10),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  border: Border.all(),
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.all(20),
+                  child: EditableText(
+                    minLines: 5,
+                    maxLines: 20,
+                    controller: _textController,
+                    focusNode: FocusNode(),
+                    style: TextStyle(color: Colors.black),
+                    cursorColor: Colors.tealAccent,
+                    backgroundCursorColor: Colors.grey,
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
+              Align(
+                alignment: AlignmentGeometry.bottomRight,
+                child: ElevatedButton(onPressed: null, child: Text('Save')),
+              ),
+            ],
           ),
         ],
       ),
