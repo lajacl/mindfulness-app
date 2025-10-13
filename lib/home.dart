@@ -78,48 +78,27 @@ class _HomePageState extends State<HomePage> {
                 _getDate(),
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
               ),
-              // SizedBox(
-              //   width: double.infinity,
-              //   child: Card(
-              //     child: Padding(
-              //       padding: EdgeInsets.all(10),
-              //       child: Column(
-              //         children: [
-              //           Text(_message['text']!, style: TextStyle(fontSize: 18)),
-              //           Align(
-              //             alignment: AlignmentGeometry.bottomRight,
-              //             child: Text(
-              //               _message['verse']!,
-              //               style: TextStyle(fontSize: 18),
-              //             ),
-              //           ),
-              //         ],
-              //       ),
-              //     ),
-              //   ),
-              // ),
-              Container(
-                decoration: BoxDecoration(
-                  border: Border.all(),
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                ),
-                child: Padding(
-                  padding: EdgeInsets.all(20),
-                  child: Column(
-                    children: [
-                      Text(_message['text']!, style: TextStyle(fontSize: 18)),
-                      Align(
-                        alignment: AlignmentGeometry.bottomRight,
-                        child: Text(
-                          _message['verse']!,
-                          style: TextStyle(fontSize: 18),
+              SizedBox(
+                width: double.infinity,
+                child: Card(
+                  child: Padding(
+                    padding: EdgeInsets.all(10),
+                    child: Column(
+                      children: [
+                        Text(_message['text']!, style: TextStyle(fontSize: 18)),
+                        Align(
+                          alignment: AlignmentGeometry.bottomRight,
+                          child: Text(
+                            _message['verse']!,
+                            style: TextStyle(fontSize: 18),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 50),
               if (_mood == null)
                 Column(
                   children: [
@@ -155,7 +134,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ],
                 ),
-              SizedBox(height: 20),
+              SizedBox(height: 50),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -174,17 +153,23 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
               if (_journalEntry.isEmpty)
-                Text('No entry for today yet.', style: TextStyle(color: Colors.grey))
+                Text(
+                  'No entry for today yet.',
+                  style: TextStyle(color: Colors.grey),
+                )
               else
                 Container(
                   width: double.infinity,
+                  height: 100,
                   decoration: BoxDecoration(
                     border: Border.all(),
                     borderRadius: BorderRadius.all(Radius.circular(10)),
                   ),
-                  child: Padding(
-                    padding: EdgeInsets.all(20),
-                    child: Text(_journalEntry),
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: EdgeInsets.all(20),
+                      child: Text(_journalEntry),
+                    ),
                   ),
                 ),
             ],
