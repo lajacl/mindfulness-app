@@ -109,7 +109,7 @@ final List<Map<String, String>> textExercises = [
 
 enum Mood {
   good(label: 'Good', icon: Icons.sentiment_very_satisfied),
-  okay(label: 'Okay', icon: Icons.sentiment_very_satisfied),
+  okay(label: 'Okay', icon: Icons.sentiment_neutral),
   bad(label: 'Bad', icon: Icons.sentiment_very_dissatisfied);
 
   const Mood({required this.label, required this.icon});

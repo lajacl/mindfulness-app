@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mindfulness_app/data.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MoodPage extends StatefulWidget {
   const MoodPage({super.key});
@@ -11,6 +12,7 @@ class MoodPage extends StatefulWidget {
 
 class _MoodPageState extends State<MoodPage> {
   Mood? _mood;
+  final List<Mood> _moodHistory = [];
 
   String _getDate() {
     DateTime datetime = DateTime.now();
@@ -23,12 +25,48 @@ class _MoodPageState extends State<MoodPage> {
     });
   }
 
+  String _getMockDate(daysPast) {
+    DateTime datetime = DateTime.now().subtract(Duration(days: daysPast));
+    return DateFormat('MMMM d, yyyy').format(datetime);
+  }
+
+  Future<void> _loadSavedMoods() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!prefs.containsKey('moodHistory')) {
+      List<String> moodList = [
+        'good',
+        'okay',
+        'bad',
+        'bad',
+        'okay',
+        'okay',
+        'good',
+        'good',
+        'bad',
+        'good',
+      ];
+      prefs.setStringList('moodHistory', moodList);
+    }
+    List<String>? moodNameList = prefs.getStringList('moodHistory');
+    setState(() {
+      moodNameList?.forEach((mood) {
+        _moodHistory.add(Mood.values.byName(mood));
+      });
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSavedMoods();
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
 
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 25, vertical: 20),
+      padding: EdgeInsets.only(top: 20),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
@@ -41,13 +79,13 @@ class _MoodPageState extends State<MoodPage> {
               children: [
                 Text('How are you?', style: TextStyle(fontSize: 20)),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: Mood.values.map((mood) {
                     return Column(
                       children: [
                         IconButton(
                           icon: Icon(
-                            Icons.sentiment_very_satisfied,
+                            mood.icon,
                             size: screenWidth / (Mood.values.length + 1),
                           ),
                           onPressed: () => _updateMood(mood),
@@ -63,7 +101,7 @@ class _MoodPageState extends State<MoodPage> {
             Column(
               children: [
                 IconButton(
-                  icon: Icon(_mood!.icon, size: screenWidth / 3),
+                  icon: Icon(_mood!.icon, size: screenWidth / 4),
                   onPressed: () => _updateMood(null),
                 ),
                 TextButton.icon(
@@ -74,6 +112,26 @@ class _MoodPageState extends State<MoodPage> {
                 ),
               ],
             ),
+          SizedBox(height: 20),
+          Text(
+            'History',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+          ),
+          Expanded(
+            child: ListView.separated(
+              itemCount: _moodHistory.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  leading: Icon(_moodHistory[index].icon, size: 50),
+                  title: Text(_getMockDate(index + 1)),
+                  subtitle: Text(_moodHistory[index].label),
+                );
+              },
+              separatorBuilder: (BuildContext context, int index) {
+                return Divider();
+              },
+            ),
+          ),
         ],
       ),
     );
