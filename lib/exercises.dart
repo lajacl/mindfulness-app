@@ -15,7 +15,7 @@ class _ExercisesPageState extends State<ExercisesPage>
   bool _videoSelected = false;
   bool _textSelected = false;
   final _playController = YoutubePlayerController();
-  late TabController _nestedConrtoller;
+  late final TabController _nestedController;
 
   void _selectVideo(item) {
     setState(() {
@@ -38,12 +38,12 @@ class _ExercisesPageState extends State<ExercisesPage>
   @override
   void initState() {
     super.initState();
-    _nestedConrtoller = TabController(length: 2, vsync: this);
+    _nestedController = TabController(length: 2, vsync: this);
   }
 
   @override
   void dispose() {
-    _nestedConrtoller.dispose();
+    _nestedController.dispose();
     super.dispose();
   }
 
@@ -82,7 +82,7 @@ class _ExercisesPageState extends State<ExercisesPage>
                 alignment: AlignmentGeometry.topCenter,
               ),
         TabBar(
-          controller: _nestedConrtoller,
+          controller: _nestedController,
           tabs: [
             Tab(icon: Icon(Icons.video_library), text: 'Video'),
             Tab(icon: Icon(Icons.library_books), text: 'Text'),
@@ -90,7 +90,7 @@ class _ExercisesPageState extends State<ExercisesPage>
         ),
         Expanded(
           child: TabBarView(
-            controller: _nestedConrtoller,
+            controller: _nestedController,
             children: [
               Material(
                 child: ListView.builder(
