@@ -19,19 +19,26 @@ class _MoodPageState extends State<MoodPage> {
     return DateFormat('MMMM d, yyyy').format(datetime);
   }
 
-  void _updateMood(mood) {
+  Future<void> _updateMood(Mood? mood) async {
+    final prefs = await SharedPreferences.getInstance();
+    if (mood != null) {
+      await prefs.setString('mood', mood.name);
+    } else {
+      await prefs.remove('mood');
+    }
     setState(() {
       _mood = mood;
     });
   }
 
-  String _getMockDate(daysPast) {
+  String _getMockDate(int daysPast) {
     DateTime datetime = DateTime.now().subtract(Duration(days: daysPast));
     return DateFormat('MMMM d, yyyy').format(datetime);
   }
 
-  Future<void> _loadSavedMoods() async {
+  Future<void> _loadMoodData() async {
     final prefs = await SharedPreferences.getInstance();
+
     if (!prefs.containsKey('moodHistory')) {
       List<String> moodList = [
         'good',
@@ -45,10 +52,13 @@ class _MoodPageState extends State<MoodPage> {
         'bad',
         'good',
       ];
-      prefs.setStringList('moodHistory', moodList);
+      await prefs.setStringList('moodHistory', moodList);
     }
     List<String>? moodNameList = prefs.getStringList('moodHistory');
     setState(() {
+      if (prefs.containsKey('mood')) {
+        _mood = Mood.values.byName(prefs.getString('mood')!);
+      }
       moodNameList?.forEach((mood) {
         _moodHistory.add(Mood.values.byName(mood));
       });
@@ -58,7 +68,7 @@ class _MoodPageState extends State<MoodPage> {
   @override
   void initState() {
     super.initState();
-    _loadSavedMoods();
+    _loadMoodData();
   }
 
   @override
