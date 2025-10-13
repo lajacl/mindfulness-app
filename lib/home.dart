@@ -4,7 +4,8 @@ import 'package:mindfulness_app/data.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final TabController tabController;
+  const HomePage({super.key, required this.tabController});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -17,6 +18,7 @@ class _HomePageState extends State<HomePage> {
     'verse': '2 Timothy 1:7',
   };
   Mood? _mood;
+  String _journalEntry = '';
 
   String _getDate() {
     DateTime datetime = DateTime.now();
@@ -44,85 +46,149 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  Future<void> _loadJournalEntry() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    if (prefs.containsKey('journalEntry')) {
+      setState(() {
+        _journalEntry = prefs.getString('journalEntry') ?? '';
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     _loadMood();
+    _loadJournalEntry();
   }
 
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
 
-    return Center(
-      child: Padding(
-        padding: EdgeInsets.all(20),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              _getDate(),
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
-            ),
-            Container(
-              decoration: BoxDecoration(
-                border: Border.all(),
-                borderRadius: BorderRadius.all(Radius.circular(10)),
+    return SingleChildScrollView(
+      child: Center(
+        child: Padding(
+          padding: EdgeInsets.all(20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                _getDate(),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
               ),
-              child: Padding(
-                padding: EdgeInsets.all(20),
-                child: Column(
-                  children: [
-                    Text(_message['text']!, style: TextStyle(fontSize: 18)),
-                    Align(
-                      alignment: AlignmentGeometry.bottomRight,
-                      child: Text(
-                        _message['verse']!,
-                        style: TextStyle(fontSize: 18),
+              // SizedBox(
+              //   width: double.infinity,
+              //   child: Card(
+              //     child: Padding(
+              //       padding: EdgeInsets.all(10),
+              //       child: Column(
+              //         children: [
+              //           Text(_message['text']!, style: TextStyle(fontSize: 18)),
+              //           Align(
+              //             alignment: AlignmentGeometry.bottomRight,
+              //             child: Text(
+              //               _message['verse']!,
+              //               style: TextStyle(fontSize: 18),
+              //             ),
+              //           ),
+              //         ],
+              //       ),
+              //     ),
+              //   ),
+              // ),
+              Container(
+                decoration: BoxDecoration(
+                  border: Border.all(),
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.all(20),
+                  child: Column(
+                    children: [
+                      Text(_message['text']!, style: TextStyle(fontSize: 18)),
+                      Align(
+                        alignment: AlignmentGeometry.bottomRight,
+                        child: Text(
+                          _message['verse']!,
+                          style: TextStyle(fontSize: 18),
+                        ),
                       ),
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
+              if (_mood == null)
+                Column(
+                  children: [
+                    Text('How are you?', style: TextStyle(fontSize: 20)),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: Mood.values.map((mood) {
+                        return Column(
+                          children: [
+                            IconButton(
+                              icon: Icon(
+                                mood.icon,
+                                size: screenWidth / (Mood.values.length + 1),
+                              ),
+                              onPressed: () => _updateMood(mood),
+                            ),
+                            Text(mood.label),
+                          ],
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                )
+              else
+                Column(
+                  children: [
+                    Icon(_mood!.icon, size: screenWidth / 4),
+                    TextButton.icon(
+                      label: Text(_mood!.label),
+                      icon: Icon(Icons.edit),
+                      iconAlignment: IconAlignment.end,
+                      onPressed: () => _updateMood(null),
                     ),
                   ],
                 ),
-              ),
-            ),
-            SizedBox(height: 20),
-            if (_mood == null)
-              Column(
+              SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('How are you?', style: TextStyle(fontSize: 20)),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: Mood.values.map((mood) {
-                      return Column(
-                        children: [
-                          IconButton(
-                            icon: Icon(
-                              mood.icon,
-                              size: screenWidth / (Mood.values.length + 1),
-                            ),
-                            onPressed: () => _updateMood(mood),
-                          ),
-                          Text(mood.label),
-                        ],
-                      );
-                    }).toList(),
+                  Text(
+                    'Journal Entry:',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
-                ],
-              )
-            else
-              Column(
-                children: [
-                  Icon(_mood!.icon, size: screenWidth / 4),
-                  TextButton.icon(
-                    label: Text(_mood!.label),
-                    icon: Icon(Icons.edit),
-                    iconAlignment: IconAlignment.end,
-                    onPressed: () => _updateMood(null),
+                  IconButton(
+                    onPressed: () {
+                      widget.tabController.animateTo(3);
+                    },
+                    icon: Icon(
+                      _journalEntry.isEmpty ? Icons.post_add : Icons.edit_note,
+                    ),
                   ),
                 ],
               ),
-            SizedBox(height: 20),
-          ],
+              if (_journalEntry.isEmpty)
+                Text('No entry for today yet.', style: TextStyle(color: Colors.grey))
+              else
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    border: Border.all(),
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.all(20),
+                    child: Text(_journalEntry),
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );

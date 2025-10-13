@@ -32,15 +32,31 @@ class MindfulPage extends StatefulWidget {
   State<MindfulPage> createState() => _MindfulPageState();
 }
 
-class _MindfulPageState extends State<MindfulPage> {
+class _MindfulPageState extends State<MindfulPage>
+    with SingleTickerProviderStateMixin {
+  late final TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 5, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 5,
       child: Scaffold(
         appBar: AppBar(
-          bottom: const TabBar(
-            tabs: [
+          bottom: TabBar(
+            controller: _tabController,
+            tabs: const [
               Tab(icon: Icon(Icons.home)),
               Tab(icon: Icon(Icons.psychology)),
               Tab(icon: Icon(Icons.sentiment_very_satisfied)),
@@ -52,8 +68,9 @@ class _MindfulPageState extends State<MindfulPage> {
           title: Text(widget.title),
         ),
         body: TabBarView(
+          controller: _tabController,
           children: [
-            HomePage(),
+            HomePage(tabController: _tabController),
             ExercisesPage(),
             MoodPage(),
             JournalPage(),

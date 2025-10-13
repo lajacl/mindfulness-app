@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class JournalPage extends StatefulWidget {
   const JournalPage({super.key});
@@ -18,9 +19,22 @@ class _JournalPageState extends State<JournalPage> {
     return DateFormat('MMMM d, yyyy').format(datetime);
   }
 
-  void _saveEntry() {
+  Future<void> _loadEntry() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    if (prefs.containsKey('journalEntry')) {
+      setState(() {
+        _textController.text = prefs.getString('journalEntry') ?? '';
+      });
+    }
+  }
+
+  Future<void> _saveEntry() async {
+    String trimmedText = _textController.text.trim();
+    if (trimmedText.isEmpty) return;
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString('journalEntry', trimmedText);
     setState(() {
-      if (_textController.text.trim().isEmpty) return;
       _isEditing = false;
     });
   }
@@ -32,6 +46,7 @@ class _JournalPageState extends State<JournalPage> {
   }
 
   void _onTextChanged(value) {
+    if (!_isEditing) _isEditing = true;
     if (_canSubmit != value.trim().isNotEmpty) {
       setState(() {
         _canSubmit = value.trim().isNotEmpty;
@@ -43,6 +58,13 @@ class _JournalPageState extends State<JournalPage> {
   void initState() {
     super.initState();
     _textController = TextEditingController();
+    _loadEntry();
+  }
+
+  @override
+  void dispose() {
+    _textController.dispose();
+    super.dispose();
   }
 
   @override
