@@ -112,10 +112,7 @@ class _HomePageState extends State<HomePage> {
             else
               Column(
                 children: [
-                  IconButton(
-                    icon: Icon(_mood!.icon, size: screenWidth / 4),
-                    onPressed: () => _updateMood(null),
-                  ),
+                  Icon(_mood!.icon, size: screenWidth / 4),
                   TextButton.icon(
                     label: Text(_mood!.label),
                     icon: Icon(Icons.edit),
@@ -124,6 +121,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ],
               ),
+            SizedBox(height: 20),
           ],
         ),
       ),

@@ -110,10 +110,7 @@ class _MoodPageState extends State<MoodPage> {
           else
             Column(
               children: [
-                IconButton(
-                  icon: Icon(_mood!.icon, size: screenWidth / 4),
-                  onPressed: () => _updateMood(null),
-                ),
+                Icon(_mood!.icon, size: screenWidth / 4),
                 TextButton.icon(
                   label: Text(_mood!.label),
                   icon: Icon(Icons.edit),
