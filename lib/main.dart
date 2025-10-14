@@ -5,11 +5,11 @@ import 'package:mindfulness_app/journal.dart';
 import 'package:mindfulness_app/mood.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const MindfulnessApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class MindfulnessApp extends StatelessWidget {
+  const MindfulnessApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -18,21 +18,22 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const MindfulPage(title: 'Mindful Me'),
+      home: const MainPage(title: 'Mindful Me'),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
 
-class MindfulPage extends StatefulWidget {
-  const MindfulPage({super.key, required this.title});
+class MainPage extends StatefulWidget {
+  const MainPage({super.key, required this.title});
 
   final String title;
 
   @override
-  State<MindfulPage> createState() => _MindfulPageState();
+  State<MainPage> createState() => _MainPageState();
 }
 
-class _MindfulPageState extends State<MindfulPage>
+class _MainPageState extends State<MainPage>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
 
@@ -60,7 +61,7 @@ class _MindfulPageState extends State<MindfulPage>
               Tab(icon: Icon(Icons.home)),
               Tab(icon: Icon(Icons.psychology)),
               Tab(icon: Icon(Icons.sentiment_very_satisfied)),
-              Tab(icon: Icon(Icons.edit_note)),
+              Tab(icon: Icon(Icons.article)),
               Tab(icon: Icon(Icons.music_note)),
             ],
           ),
