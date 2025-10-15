@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mindfulness_app/data.dart';
+import 'package:mindfulness_app/theme.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
 class ExercisesPage extends StatefulWidget {
@@ -65,10 +66,14 @@ class _ExercisesPageState extends State<ExercisesPage>
                     child: Column(
                       children: [
                         Text(
-                          '${_selectedItem!['title']}\n',
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                          '${_selectedItem!['title']}',
+                          style: Theme.of(context).textTheme.titleMedium,
                         ),
-                        Text(_selectedItem!['text']!),
+                        SizedBox(height: 10),
+                        Text(
+                          _selectedItem!['text']!,
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
                       ],
                     ),
                   ),
@@ -97,14 +102,20 @@ class _ExercisesPageState extends State<ExercisesPage>
                   itemCount: videoExercises.length,
                   itemBuilder: (context, index) {
                     return ListTile(
-                      title: Text(videoExercises[index]["title"]!),
-                      trailing: Icon(Icons.play_circle_outline),
+                      title: Text(
+                        videoExercises[index]["title"]!,
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
+                      trailing: Icon(
+                        Icons.play_circle_outline,
+                        color: MindfulnessTheme.mutedCoral,
+                      ),
                       onTap: () => _selectVideo(videoExercises[index]),
                       selected: _videoSelected
                           ? videoExercises[index]['title'] ==
                                 _selectedItem!['title']
                           : false,
-                      selectedTileColor: Colors.cyan,
+                      selectedTileColor: MindfulnessTheme.softTeal,
                     );
                   },
                 ),
@@ -114,14 +125,20 @@ class _ExercisesPageState extends State<ExercisesPage>
                   itemCount: textExercises.length,
                   itemBuilder: (context, index) {
                     return ListTile(
-                      title: Text(textExercises[index]["title"]!),
-                      trailing: Icon(Icons.chevron_right),
+                      title: Text(
+                        textExercises[index]["title"]!,
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
+                      trailing: Icon(
+                        Icons.chevron_right,
+                        color: MindfulnessTheme.mutedCoral,
+                      ),
                       onTap: () => _selectText(textExercises[index]),
                       selected: _textSelected
                           ? textExercises[index]['title'] ==
                                 _selectedItem!['title']
                           : false,
-                      selectedTileColor: Colors.cyan,
+                      selectedTileColor: MindfulnessTheme.softTeal,
                     );
                   },
                 ),

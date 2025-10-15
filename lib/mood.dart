@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mindfulness_app/data.dart';
+import 'package:mindfulness_app/main.dart';
+import 'package:mindfulness_app/theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MoodPage extends StatefulWidget {
@@ -42,6 +44,8 @@ class _MoodPageState extends State<MoodPage> {
     if (!prefs.containsKey('moodHistory')) {
       List<String> moodList = [
         'good',
+        'good',
+        'good',
         'okay',
         'bad',
         'bad',
@@ -51,6 +55,8 @@ class _MoodPageState extends State<MoodPage> {
         'good',
         'bad',
         'good',
+        'bad',
+        'okay',
       ];
       await prefs.setStringList('moodHistory', moodList);
     }
@@ -80,14 +86,15 @@ class _MoodPageState extends State<MoodPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
-          Text(
-            _getDate(),
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
-          ),
+          Text(_getDate(), style: Theme.of(context).textTheme.headlineLarge),
+          SizedBox(height: 10),
           if (_mood == null)
             Column(
               children: [
-                Text('How are you?', style: TextStyle(fontSize: 20)),
+                Text(
+                  'How are you?',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: Mood.values.map((mood) {
@@ -97,10 +104,14 @@ class _MoodPageState extends State<MoodPage> {
                           icon: Icon(
                             mood.icon,
                             size: screenWidth / (Mood.values.length + 1),
+                            color: mood.color,
                           ),
                           onPressed: () => _updateMood(mood),
                         ),
-                        Text(mood.label),
+                        Text(
+                          mood.label,
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
                       ],
                     );
                   }).toList(),
@@ -110,33 +121,47 @@ class _MoodPageState extends State<MoodPage> {
           else
             Column(
               children: [
-                Icon(_mood!.icon, size: screenWidth / 4),
+                Icon(_mood!.icon, size: screenWidth / 4, color: _mood!.color),
                 TextButton.icon(
-                  label: Text(_mood!.label),
-                  icon: Icon(Icons.edit),
+                  label: Text(
+                    _mood!.label,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                  icon: Icon(Icons.edit, color: MindfulnessTheme.softGray),
                   iconAlignment: IconAlignment.end,
                   onPressed: () => _updateMood(null),
                 ),
               ],
             ),
-          SizedBox(height: 20),
-          Text(
-            'History',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-          ),
+          SizedBox(height: 50),
+          Text('History', style: Theme.of(context).textTheme.titleMedium),
+          SizedBox(height: 8),
           Expanded(
-            child: ListView.separated(
-              itemCount: _moodHistory.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  leading: Icon(_moodHistory[index].icon, size: 50),
-                  title: Text(_getMockDate(index + 1)),
-                  subtitle: Text(_moodHistory[index].label),
-                );
-              },
-              separatorBuilder: (BuildContext context, int index) {
-                return Divider();
-              },
+            child: Container(
+              color: MindfulnessTheme.offWhite,
+              child: ListView.separated(
+                itemCount: _moodHistory.length,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    leading: Icon(
+                      _moodHistory[index].icon,
+                      size: 50,
+                      color: _moodHistory[index].color,
+                    ),
+                    title: Text(
+                      _getMockDate(index + 1),
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                    subtitle: Text(
+                      _moodHistory[index].label,
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                  );
+                },
+                separatorBuilder: (BuildContext context, int index) {
+                  return Divider();
+                },
+              ),
             ),
           ),
         ],

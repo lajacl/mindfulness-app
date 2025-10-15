@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'theme.dart';
 
-final List<Map<String, String>> videoExercises = [
+const List<Map<String, String>> videoExercises = [
   {"title": "Be Present", "videoId": "ZToicYcHIOU"},
   {"title": "Letting Go", "videoId": "syx3a1_LeFo"},
   {"title": "Self Soothing", "videoId": "Xl_B45DpMLU"},
@@ -15,7 +15,7 @@ final List<Map<String, String>> videoExercises = [
   {"title": "Just Breathe", "videoId": "IyW4nwfwunw"},
 ];
 
-final List<Map<String, String>> textExercises = [
+const List<Map<String, String>> textExercises = [
   {
     "title": "Body Scan Meditation",
     "text":
@@ -108,12 +108,25 @@ final List<Map<String, String>> textExercises = [
 ];
 
 enum Mood {
-  good(label: 'Good', icon: Icons.sentiment_very_satisfied),
-  okay(label: 'Okay', icon: Icons.sentiment_neutral),
-  bad(label: 'Bad', icon: Icons.sentiment_very_dissatisfied);
+  good(
+    label: 'Good',
+    icon: Icons.sentiment_very_satisfied,
+    color: MindfulnessTheme.softTeal,
+  ),
+  okay(
+    label: 'Okay',
+    icon: Icons.sentiment_neutral,
+    color: MindfulnessTheme.skyBlue,
+  ),
+  bad(
+    label: 'Bad',
+    icon: Icons.sentiment_very_dissatisfied,
+    color: MindfulnessTheme.mutedCoral,
+  );
 
-  const Mood({required this.label, required this.icon});
+  const Mood({required this.label, required this.icon, required this.color});
 
   final String label;
   final IconData icon;
+  final Color color;
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mindfulness_app/data.dart';
+import 'package:mindfulness_app/theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
@@ -76,21 +77,29 @@ class _HomePageState extends State<HomePage> {
             children: <Widget>[
               Text(
                 _getDate(),
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+                style: Theme.of(context).textTheme.headlineLarge,
               ),
+              SizedBox(height: 10),
               SizedBox(
                 width: double.infinity,
                 child: Card(
+                  color: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadiusGeometry.circular(4),
+                  ),
                   child: Padding(
                     padding: EdgeInsets.all(10),
                     child: Column(
                       children: [
-                        Text(_message['text']!, style: TextStyle(fontSize: 18)),
+                        Text(
+                          _message['text']!,
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
                         Align(
                           alignment: AlignmentGeometry.bottomRight,
                           child: Text(
                             _message['verse']!,
-                            style: TextStyle(fontSize: 18),
+                            style: Theme.of(context).textTheme.titleSmall,
                           ),
                         ),
                       ],
@@ -102,7 +111,10 @@ class _HomePageState extends State<HomePage> {
               if (_mood == null)
                 Column(
                   children: [
-                    Text('How are you?', style: TextStyle(fontSize: 20)),
+                    Text(
+                      'How are you?',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: Mood.values.map((mood) {
@@ -112,10 +124,14 @@ class _HomePageState extends State<HomePage> {
                               icon: Icon(
                                 mood.icon,
                                 size: screenWidth / (Mood.values.length + 1),
+                                color: mood.color,
                               ),
                               onPressed: () => _updateMood(mood),
                             ),
-                            Text(mood.label),
+                            Text(
+                              mood.label,
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
                           ],
                         );
                       }).toList(),
@@ -125,10 +141,17 @@ class _HomePageState extends State<HomePage> {
               else
                 Column(
                   children: [
-                    Icon(_mood!.icon, size: screenWidth / 4),
+                    Icon(
+                      _mood!.icon,
+                      size: screenWidth / 4,
+                      color: _mood!.color,
+                    ),
                     TextButton.icon(
-                      label: Text(_mood!.label),
-                      icon: Icon(Icons.edit),
+                      label: Text(
+                        _mood!.label,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                      icon: Icon(Icons.edit, color: MindfulnessTheme.softGray),
                       iconAlignment: IconAlignment.end,
                       onPressed: () => _updateMood(null),
                     ),
@@ -140,7 +163,7 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   Text(
                     'Journal Entry:',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: Theme.of(context).textTheme.titleSmall,
                   ),
                   IconButton(
                     onPressed: () {
@@ -155,7 +178,7 @@ class _HomePageState extends State<HomePage> {
               if (_journalEntry.isEmpty)
                 Text(
                   'No entry for today yet.',
-                  style: TextStyle(color: Colors.grey),
+                  style: Theme.of(context).textTheme.bodySmall,
                 )
               else
                 Container(
@@ -163,12 +186,15 @@ class _HomePageState extends State<HomePage> {
                   height: 100,
                   decoration: BoxDecoration(
                     border: Border.all(),
-                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                    borderRadius: BorderRadius.all(Radius.circular(4)),
                   ),
                   child: SingleChildScrollView(
                     child: Padding(
                       padding: EdgeInsets.all(20),
-                      child: Text(_journalEntry),
+                      child: Text(
+                        _journalEntry,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
                     ),
                   ),
                 ),

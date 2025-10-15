@@ -41,6 +41,7 @@ class _JournalPageState extends State<JournalPage> {
 
   void _editEntry() {
     setState(() {
+      if (_textController.text.trim().isNotEmpty) _canSubmit = true;
       _isEditing = true;
     });
   }
@@ -77,7 +78,7 @@ class _JournalPageState extends State<JournalPage> {
         children: <Widget>[
           Text(
             _getDate(),
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+            style: Theme.of(context).textTheme.headlineLarge,
             textAlign: TextAlign.center,
           ),
           SizedBox(height: 10),
@@ -86,7 +87,7 @@ class _JournalPageState extends State<JournalPage> {
             children: [
               Text(
                 'Journal Entry:',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                style: Theme.of(context).textTheme.titleSmall,
               ),
               if (_textController.text.isNotEmpty && !_isEditing)
                 IconButton(
@@ -102,7 +103,7 @@ class _JournalPageState extends State<JournalPage> {
               Container(
                 decoration: BoxDecoration(
                   border: Border.all(),
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  borderRadius: BorderRadius.all(Radius.circular(4)),
                 ),
                 child: Padding(
                   padding: EdgeInsets.all(20),

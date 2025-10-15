@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:mindfulness_app/home.dart';
 import 'package:mindfulness_app/exercises.dart';
+import 'package:mindfulness_app/home.dart';
 import 'package:mindfulness_app/journal.dart';
 import 'package:mindfulness_app/mood.dart';
+import 'package:mindfulness_app/theme.dart';
 
 void main() {
   runApp(const MindfulnessApp());
@@ -15,9 +16,7 @@ class MindfulnessApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Mindfulness App',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
+      theme: MindfulnessTheme.theme,
       home: const MainPage(title: 'Mindful Me'),
       debugShowCheckedModeBanner: false,
     );
@@ -55,6 +54,7 @@ class _MainPageState extends State<MainPage>
       length: 5,
       child: Scaffold(
         appBar: AppBar(
+          toolbarHeight: 0,
           bottom: TabBar(
             controller: _tabController,
             tabs: const [
@@ -66,10 +66,10 @@ class _MainPageState extends State<MainPage>
             ],
           ),
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-          title: Text(widget.title),
         ),
         body: TabBarView(
           controller: _tabController,
+          physics: NeverScrollableScrollPhysics(),
           children: [
             HomePage(tabController: _tabController),
             ExercisesPage(),
