@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mindfulness_app/data.dart';
-import 'package:mindfulness_app/main.dart';
 import 'package:mindfulness_app/theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -40,7 +39,6 @@ class _MoodPageState extends State<MoodPage> {
 
   Future<void> _loadMoodData() async {
     final prefs = await SharedPreferences.getInstance();
-
     if (!prefs.containsKey('moodHistory')) {
       List<String> moodList = [
         'good',
@@ -137,32 +135,37 @@ class _MoodPageState extends State<MoodPage> {
           Text('History', style: Theme.of(context).textTheme.titleMedium),
           SizedBox(height: 8),
           Expanded(
-            child: Container(
-              color: MindfulnessTheme.offWhite,
-              child: ListView.separated(
-                itemCount: _moodHistory.length,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    leading: Icon(
-                      _moodHistory[index].icon,
-                      size: 50,
-                      color: _moodHistory[index].color,
+            child: _moodHistory.isNotEmpty
+                ? Container(
+                    color: MindfulnessTheme.offWhite,
+                    child: ListView.separated(
+                      itemCount: _moodHistory.length,
+                      itemBuilder: (context, index) {
+                        return ListTile(
+                          leading: Icon(
+                            _moodHistory[index].icon,
+                            size: 50,
+                            color: _moodHistory[index].color,
+                          ),
+                          title: Text(
+                            _getMockDate(index + 1),
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                          subtitle: Text(
+                            _moodHistory[index].label,
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                        );
+                      },
+                      separatorBuilder: (BuildContext context, int index) {
+                        return Divider();
+                      },
                     ),
-                    title: Text(
-                      _getMockDate(index + 1),
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                    subtitle: Text(
-                      _moodHistory[index].label,
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                  );
-                },
-                separatorBuilder: (BuildContext context, int index) {
-                  return Divider();
-                },
-              ),
-            ),
+                  )
+                : Text(
+                    'Nothing to see here yet.',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
           ),
         ],
       ),
