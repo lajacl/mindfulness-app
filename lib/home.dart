@@ -183,7 +183,7 @@ class _HomePageState extends State<HomePage> {
               else
                 Container(
                   width: double.infinity,
-                  height: 100,
+                  height: 200,
                   decoration: BoxDecoration(
                     border: Border.all(),
                     borderRadius: BorderRadius.all(Radius.circular(4)),

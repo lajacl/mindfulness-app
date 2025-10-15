@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:mindfulness_app/theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class JournalPage extends StatefulWidget {
@@ -11,6 +12,7 @@ class JournalPage extends StatefulWidget {
 
 class _JournalPageState extends State<JournalPage> {
   late final TextEditingController _textController;
+  String _journalEntry = '';
   bool _isEditing = false;
   bool _canSubmit = false;
 
@@ -21,10 +23,11 @@ class _JournalPageState extends State<JournalPage> {
 
   Future<void> _loadEntry() async {
     final prefs = await SharedPreferences.getInstance();
-
+    // prefs.remove('journalEntry');
     if (prefs.containsKey('journalEntry')) {
       setState(() {
         _textController.text = prefs.getString('journalEntry') ?? '';
+        _journalEntry = _textController.text;
       });
     }
   }
@@ -35,6 +38,7 @@ class _JournalPageState extends State<JournalPage> {
     final prefs = await SharedPreferences.getInstance();
     prefs.setString('journalEntry', trimmedText);
     setState(() {
+      _journalEntry = trimmedText;
       _isEditing = false;
     });
   }
@@ -46,6 +50,13 @@ class _JournalPageState extends State<JournalPage> {
     });
   }
 
+  void _cancelEdit() {
+    setState(() {
+      _isEditing = false;
+      _textController.text = _journalEntry;
+    });
+  }
+
   void _onTextChanged(value) {
     if (!_isEditing) _isEditing = true;
     if (_canSubmit != value.trim().isNotEmpty) {
@@ -53,6 +64,45 @@ class _JournalPageState extends State<JournalPage> {
         _canSubmit = value.trim().isNotEmpty;
       });
     }
+  }
+
+  Future<void> _showAlertDialog(BuildContext context) async {
+    return showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: const Text('Confirm Action'),
+          content: const Text(
+            'Are you sure you want to delete the journal entry?',
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+              },
+            ),
+            TextButton(
+              onPressed: () {
+                _deleteEntry();
+                Navigator.of(dialogContext).pop();
+              },
+              child: const Text('Confirm'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _deleteEntry() async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.remove('journalEntry');
+    setState(() {
+      _canSubmit = false;
+      _journalEntry = '';
+      _textController.text = _journalEntry;
+    });
   }
 
   @override
@@ -122,11 +172,25 @@ class _JournalPageState extends State<JournalPage> {
               ),
               SizedBox(height: 20),
               if (_textController.text.isEmpty || _isEditing)
+                Row(
+                  mainAxisAlignment: _journalEntry.isNotEmpty
+                      ? MainAxisAlignment.spaceBetween
+                      : MainAxisAlignment.end,
+                  children: [
+                    if (_journalEntry.isNotEmpty)
+                      TextButton(onPressed: _cancelEdit, child: Text('Cancel')),
+                    ElevatedButton(
+                      onPressed: _canSubmit ? () => _saveEntry() : null,
+                      child: Text('Save'),
+                    ),
+                  ],
+                )
+              else
                 Align(
-                  alignment: AlignmentGeometry.bottomRight,
-                  child: ElevatedButton(
-                    onPressed: _canSubmit ? () => _saveEntry() : null,
-                    child: Text('Save'),
+                  alignment: AlignmentGeometry.bottomLeft,
+                  child: TextButton(
+                    onPressed: () => _showAlertDialog(context),
+                    child: Text('Delete'),
                   ),
                 ),
             ],
