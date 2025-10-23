@@ -23,7 +23,7 @@ class DatabaseHelper {
     await db.execute('''
       CREATE TABLE mood_history (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        date TEXT NOT NULL
+        date TEXT NOT NULL,
         mood TEXT NOT NULL
       )
     ''');
@@ -31,8 +31,8 @@ class DatabaseHelper {
     await db.execute('''
       CREATE TABLE journal (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        date TEXT NOT NULL
-        entry TEXT NOT NULL,
+        date TEXT NOT NULL,
+        entry TEXT NOT NULL
       )
     ''');
   }

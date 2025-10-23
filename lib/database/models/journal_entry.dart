@@ -19,6 +19,6 @@ class JournalEntry {
 
   @override
   String toString() {
-    return 'Mood(id: $id, date: $date, entry: $entry)';
+    return 'JournalEntry(id: $id, date: $date, entry: $entry)';
   }
 }
