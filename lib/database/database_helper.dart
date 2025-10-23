@@ -24,7 +24,7 @@ class DatabaseHelper {
       CREATE TABLE mood_history (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         date TEXT NOT NULL
-        name TEXT NOT NULL
+        mood TEXT NOT NULL
       )
     ''');
 
