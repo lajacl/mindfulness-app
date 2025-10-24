@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:mindfulness_app/data.dart';
+import 'package:mindfulness_app/database/repositories/mood_history_repository.dart';
 import 'package:mindfulness_app/theme.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
+import 'database/models/mood_entry.dart';
 
 class MoodPage extends StatefulWidget {
   const MoodPage({super.key});
@@ -12,66 +15,53 @@ class MoodPage extends StatefulWidget {
 }
 
 class _MoodPageState extends State<MoodPage> {
-  Mood? _mood;
-  final List<Mood> _moodHistory = [];
+  final MoodHistoryRepository _moodRepository = MoodHistoryRepository();
+  MoodEntry? _currentMood;
+  List<MoodEntry> _moodHistory = [];
 
   String _getDate() {
     DateTime datetime = DateTime.now();
     return DateFormat('MMMM d, yyyy').format(datetime);
   }
 
-  Future<void> _updateMood(Mood? mood) async {
-    final prefs = await SharedPreferences.getInstance();
-    if (mood != null) {
-      await prefs.setString('mood', mood.name);
+  Future<void> _updateMood(Mood? newMood) async {
+    if (newMood == null) {
+      await _moodRepository.deleteById(_currentMood!.id!);
+      _currentMood = null;
     } else {
-      await prefs.remove('mood');
+      MoodEntry nowMood = MoodEntry(
+        date: DateTime.now().toUtc().toIso8601String(),
+        mood: newMood.name,
+      );
+      await _moodRepository.add(nowMood);
     }
-    setState(() {
-      _mood = mood;
-    });
-  }
-
-  String _getMockDate(int daysPast) {
-    DateTime datetime = DateTime.now().subtract(Duration(days: daysPast));
-    return DateFormat('MMMM d, yyyy').format(datetime);
+    _loadMoodData();
   }
 
   Future<void> _loadMoodData() async {
-    final prefs = await SharedPreferences.getInstance();
-    if (!prefs.containsKey('moodHistory')) {
-      List<String> moodList = [
-        'good',
-        'good',
-        'good',
-        'okay',
-        'bad',
-        'bad',
-        'okay',
-        'okay',
-        'good',
-        'good',
-        'bad',
-        'good',
-        'bad',
-        'okay',
-      ];
-      await prefs.setStringList('moodHistory', moodList);
+    List<MoodEntry> moodEntries = await _moodRepository.getAllByDateDesc();
+    if (moodEntries.isNotEmpty &&
+        DateUtils.isSameDay(
+          DateTime.parse(moodEntries.first.date),
+          DateTime.now(),
+        )) {
+      _currentMood = moodEntries.first;
+      moodEntries.removeAt(0);
     }
-    List<String>? moodNameList = prefs.getStringList('moodHistory');
     setState(() {
-      if (prefs.containsKey('mood')) {
-        _mood = Mood.values.byName(prefs.getString('mood')!);
-      }
-      moodNameList?.forEach((mood) {
-        _moodHistory.add(Mood.values.byName(mood));
-      });
+      _moodHistory = moodEntries;
     });
+  }
+
+  String _getFormattedDate(String entryDateTime) {
+    DateTime dateTime = DateTime.parse(entryDateTime);
+    return DateFormat('EEEE, MMMM d, yyyy h:mm a').format(dateTime.toLocal());
   }
 
   @override
   void initState() {
     super.initState();
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     _loadMoodData();
   }
 
@@ -86,7 +76,7 @@ class _MoodPageState extends State<MoodPage> {
         children: <Widget>[
           Text(_getDate(), style: Theme.of(context).textTheme.headlineLarge),
           SizedBox(height: 10),
-          if (_mood == null)
+          if (_currentMood == null)
             Column(
               children: [
                 Text(
@@ -119,10 +109,14 @@ class _MoodPageState extends State<MoodPage> {
           else
             Column(
               children: [
-                Icon(_mood!.icon, size: screenWidth / 4, color: _mood!.color),
+                Icon(
+                  Mood.values.byName(_currentMood!.mood).icon,
+                  size: screenWidth / 4,
+                  color: Mood.values.byName(_currentMood!.mood).color,
+                ),
                 TextButton.icon(
                   label: Text(
-                    _mood!.label,
+                    Mood.values.byName(_currentMood!.mood).label,
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                   icon: Icon(Icons.edit, color: MindfulnessTheme.softGray),
@@ -143,16 +137,18 @@ class _MoodPageState extends State<MoodPage> {
                       itemBuilder: (context, index) {
                         return ListTile(
                           leading: Icon(
-                            _moodHistory[index].icon,
+                            Mood.values.byName(_moodHistory[index].mood).icon,
                             size: 50,
-                            color: _moodHistory[index].color,
+                            color: Mood.values
+                                .byName(_moodHistory[index].mood)
+                                .color,
                           ),
                           title: Text(
-                            _getMockDate(index + 1),
+                            _getFormattedDate(_moodHistory[index].date),
                             style: Theme.of(context).textTheme.bodyMedium,
                           ),
                           subtitle: Text(
-                            _moodHistory[index].label,
+                            Mood.values.byName(_moodHistory[index].mood).label,
                             style: Theme.of(context).textTheme.bodySmall,
                           ),
                         );

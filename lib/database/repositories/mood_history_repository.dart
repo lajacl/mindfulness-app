@@ -1,3 +1,5 @@
+import 'package:sqflite/sqflite.dart';
+
 import '../database_helper.dart';
 import '../models/mood_entry.dart';
 
@@ -30,7 +32,7 @@ class MoodHistoryRepository {
 
   Future<int> add(MoodEntry entry) async {
     final db = await dbHelper.database;
-    return await db.insert(tableName, entry.toMap());
+    return await db.insert(tableName, entry.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
   Future<int> update(MoodEntry entry) async {
@@ -38,7 +40,7 @@ class MoodHistoryRepository {
     return await db.update(tableName, entry.toMap());
   }
 
-  Future<int> deleteById(DateTime id) async {
+  Future<int> deleteById(int id) async {
     final db = await dbHelper.database;
     return await db.delete(tableName, where: 'id = ?', whereArgs: [id]);
   }
