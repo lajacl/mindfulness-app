@@ -1,7 +1,6 @@
+import 'package:mindfulness_app/database/database_helper.dart';
+import 'package:mindfulness_app/database/models/mood_entry.dart';
 import 'package:sqflite/sqflite.dart';
-
-import '../database_helper.dart';
-import '../models/mood_entry.dart';
 
 class MoodHistoryRepository {
   final dbHelper = DatabaseHelper.instance;
@@ -32,7 +31,11 @@ class MoodHistoryRepository {
 
   Future<int> add(MoodEntry entry) async {
     final db = await dbHelper.database;
-    return await db.insert(tableName, entry.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
+    return await db.insert(
+      tableName,
+      entry.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
   }
 
   Future<int> update(MoodEntry entry) async {

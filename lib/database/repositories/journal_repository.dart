@@ -1,5 +1,6 @@
-import '../database_helper.dart';
-import '../models/journal_entry.dart';
+import 'package:mindfulness_app/database/database_helper.dart';
+import 'package:mindfulness_app/database/models/journal_entry.dart';
+import 'package:sqflite/sqflite.dart';
 
 class JournalRepository {
   final dbHelper = DatabaseHelper.instance;
@@ -30,7 +31,11 @@ class JournalRepository {
 
   Future<int> add(JournalEntry entry) async {
     final db = await dbHelper.database;
-    return await db.insert(tableName, entry.toMap());
+    return await db.insert(
+      tableName,
+      entry.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
   }
 
   Future<int> update(JournalEntry entry) async {
