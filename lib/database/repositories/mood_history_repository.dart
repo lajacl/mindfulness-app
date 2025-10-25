@@ -18,7 +18,7 @@ class MoodHistoryRepository {
     return result.map((map) => MoodEntry.fromMap(map)).toList();
   }
 
-  Future<List<MoodEntry>> getFirstWhereDateToday() async {
+  Future<MoodEntry?> getFirstWhereDateToday() async {
     final db = await dbHelper.database;
     final result = await db.query(
       tableName,
@@ -26,10 +26,10 @@ class MoodHistoryRepository {
       whereArgs: ['now'],
       limit: 1,
     );
-    return result.map((map) => MoodEntry.fromMap(map)).toList();
+    return result.isNotEmpty ? MoodEntry.fromMap(result.first) : null;
   }
 
-  Future<int> add(MoodEntry entry) async {
+  Future<int> save(MoodEntry entry) async {
     final db = await dbHelper.database;
     return await db.insert(
       tableName,

@@ -18,7 +18,7 @@ class JournalRepository {
     return result.map((map) => JournalEntry.fromMap(map)).toList();
   }
 
-  Future<List<JournalEntry>> getFirstWhereDateToday() async {
+  Future<JournalEntry?> getFirstWhereDateToday() async {
     final db = await dbHelper.database;
     final result = await db.query(
       tableName,
@@ -26,10 +26,10 @@ class JournalRepository {
       whereArgs: ['now'],
       limit: 1,
     );
-    return result.map((map) => JournalEntry.fromMap(map)).toList();
+    return result.isNotEmpty ? JournalEntry.fromMap(result.first) : null;
   }
 
-  Future<int> add(JournalEntry entry) async {
+  Future<int> save(JournalEntry entry) async {
     final db = await dbHelper.database;
     return await db.insert(
       tableName,

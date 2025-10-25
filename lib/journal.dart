@@ -15,8 +15,9 @@ class _JournalPageState extends State<JournalPage> {
   final JournalRepository _journalRepository = JournalRepository();
   final TextEditingController _textController = TextEditingController();
   final PageController _pageController = PageController();
-  String _currentEntry = '';
+
   List<JournalEntry> _entryList = [];
+  String _currentEntry = '';
   bool _isEditing = false;
   bool _canSubmit = false;
 
@@ -42,12 +43,11 @@ class _JournalPageState extends State<JournalPage> {
           entry: '',
         ),
       );
-      _isEditing = true;
-    } else {
-      _isEditing = false;
     }
     setState(() {
       _entryList = journalEntries;
+      _textController.text = _currentEntry =
+          _entryList[_pageController.initialPage].entry;
     });
   }
 
@@ -59,7 +59,8 @@ class _JournalPageState extends State<JournalPage> {
       date: entry.date,
       entry: trimmedText,
     );
-    await _journalRepository.add(updatedEntry);
+    await _journalRepository.save(updatedEntry);
+    _isEditing = false;
     _loadJournalData();
   }
 
@@ -126,6 +127,25 @@ class _JournalPageState extends State<JournalPage> {
     _loadJournalData();
   }
 
+  void _updatePageState(index) {
+    setState(() {
+      _textController.text = _currentEntry = _entryList[index].entry;
+      if (_pageController.page == 0 && _currentEntry.isEmpty) {
+        _isEditing = true;
+      } else {
+        _isEditing = false;
+      }
+    });
+  }
+
+  bool _hasPreviousPage(int index) {
+    return index < (_entryList.length - 1);
+  }
+
+  bool _hasNextPage(int index) {
+    return index > 0;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -146,9 +166,9 @@ class _JournalPageState extends State<JournalPage> {
         controller: _pageController,
         reverse: true,
         itemCount: _entryList.length,
+        onPageChanged: _updatePageState,
         itemBuilder: (BuildContext context, int index) {
-          _textController.text = _currentEntry = _entryList[index].entry;
-
+          final journalEntry = _entryList[index];
           return Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -156,36 +176,39 @@ class _JournalPageState extends State<JournalPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  IconButton(
-                    onPressed: index < (_entryList.length - 1)
-                        ? () => _pageController.nextPage(
-                            duration: Duration(milliseconds: 250),
-                            curve: Curves.linear,
-                          )
-                        : null,
-                    icon: Icon(Icons.arrow_circle_left, size: 50),
-                    color: index < (_entryList.length - 1)
-                        ? MindfulnessTheme.softTeal
-                        : MindfulnessTheme.softGray,
+                  Opacity(
+                    opacity: _hasPreviousPage(index) ? 1 : 0,
+                    child: IconButton(
+                      onPressed: _hasPreviousPage(index)
+                          ? () => _pageController.nextPage(
+                              duration: Duration(milliseconds: 250),
+                              curve: Curves.linear,
+                            )
+                          : null,
+                      icon: Icon(Icons.arrow_circle_left),
+                      iconSize: 50,
+                      color: MindfulnessTheme.softTeal,
+                      disabledColor: MindfulnessTheme.softGray,
+                    ),
                   ),
                   Text(
-                    _getFormattedDate(_entryList[index].date),
+                    _getFormattedDate(journalEntry.date),
                     style: Theme.of(context).textTheme.headlineLarge,
                     textAlign: TextAlign.center,
                   ),
-                  IconButton(
-                    onPressed: index > 0
-                        ? () => _pageController.previousPage(
-                            duration: Duration(milliseconds: 250),
-                            curve: Curves.linear,
-                          )
-                        : null,
-                    icon: Icon(
-                      Icons.arrow_circle_right,
-                      size: 50,
-                      color: index > 0
-                          ? MindfulnessTheme.softTeal
-                          : MindfulnessTheme.softGray,
+                  Opacity(
+                    opacity: _hasNextPage(index) ? 1 : 0,
+                    child: IconButton(
+                      onPressed: _hasNextPage(index)
+                          ? () => _pageController.previousPage(
+                              duration: Duration(milliseconds: 250),
+                              curve: Curves.linear,
+                            )
+                          : null,
+                      icon: Icon(Icons.arrow_circle_right),
+                      iconSize: 50,
+                      color: MindfulnessTheme.softTeal,
+                      disabledColor: MindfulnessTheme.softGray,
                     ),
                   ),
                 ],
@@ -204,7 +227,10 @@ class _JournalPageState extends State<JournalPage> {
                         ),
                         if (_textController.text.isNotEmpty && !_isEditing)
                           IconButton(
-                            icon: Icon(Icons.edit),
+                            icon: Icon(
+                              Icons.edit,
+                              color: MindfulnessTheme.softGray,
+                            ),
                             onPressed: () => _editEntry(),
                           ),
                       ],
@@ -238,19 +264,18 @@ class _JournalPageState extends State<JournalPage> {
                         SizedBox(height: 20),
                         if (_textController.text.isEmpty || _isEditing)
                           Row(
-                            mainAxisAlignment:
-                                _entryList[index].entry.isNotEmpty
+                            mainAxisAlignment: journalEntry.entry.isNotEmpty
                                 ? MainAxisAlignment.spaceBetween
                                 : MainAxisAlignment.end,
                             children: [
-                              if (_entryList[index].entry.isNotEmpty)
+                              if (journalEntry.entry.isNotEmpty)
                                 TextButton(
                                   onPressed: _cancelEdit,
                                   child: Text('Cancel'),
                                 ),
                               ElevatedButton(
                                 onPressed: _canSubmit
-                                    ? () => _saveEntry(_entryList[index])
+                                    ? () => _saveEntry(journalEntry)
                                     : null,
                                 child: Text('Save'),
                               ),
@@ -261,7 +286,7 @@ class _JournalPageState extends State<JournalPage> {
                             alignment: AlignmentGeometry.bottomLeft,
                             child: TextButton(
                               onPressed: () =>
-                                  _showAlertDialog(context, _entryList[index]),
+                                  _showAlertDialog(context, journalEntry),
                               child: Text('Delete'),
                             ),
                           ),

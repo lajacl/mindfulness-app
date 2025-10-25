@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mindfulness_app/data.dart';
+import 'package:mindfulness_app/database/models/journal_entry.dart';
+import 'package:mindfulness_app/database/models/mood_entry.dart';
+import 'package:mindfulness_app/database/repositories/journal_repository.dart';
+import 'package:mindfulness_app/database/repositories/mood_history_repository.dart';
 import 'package:mindfulness_app/theme.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
   final TabController tabController;
@@ -13,12 +16,14 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final MoodHistoryRepository _moodRepository = MoodHistoryRepository();
+  final JournalRepository _journalRepository = JournalRepository();
   final Map<String, String> _message = {
     'text':
         'God has not given me a spirit of fear, but of power and of love and of a sound mind.',
     'verse': '2 Timothy 1:7',
   };
-  Mood? _mood;
+  MoodEntry? _moodEntry;
   String _journalEntry = '';
 
   String _getDate() {
@@ -27,34 +32,32 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _loadMood() async {
-    final prefs = await SharedPreferences.getInstance();
-    if (prefs.containsKey('mood')) {
-      setState(() {
-        _mood = Mood.values.byName(prefs.getString('mood')!);
-      });
-    }
-  }
-
-  Future<void> _updateMood(Mood? mood) async {
-    final prefs = await SharedPreferences.getInstance();
-    if (mood != null) {
-      await prefs.setString('mood', mood.name);
-    } else {
-      await prefs.remove('mood');
-    }
+    MoodEntry? moodToday = await _moodRepository.getFirstWhereDateToday();
     setState(() {
-      _mood = mood;
+      _moodEntry = moodToday;
     });
   }
 
-  Future<void> _loadJournalEntry() async {
-    final prefs = await SharedPreferences.getInstance();
+  Future<void> _saveMood(Mood newMood) async {
+    MoodEntry updatedMood = MoodEntry(
+      date: DateTime.now().toUtc().toIso8601String(),
+      mood: newMood.name,
+    );
+    await _moodRepository.save(updatedMood);
+    _loadMood();
+  }
 
-    if (prefs.containsKey('journalEntry')) {
-      setState(() {
-        _journalEntry = prefs.getString('journalEntry') ?? '';
-      });
-    }
+  Future<void> _deleteMood() async {
+    await _moodRepository.deleteById(_moodEntry!.id!);
+    _loadMood();
+  }
+
+  Future<void> _loadJournalEntry() async {
+    JournalEntry? entryToday = await _journalRepository
+        .getFirstWhereDateToday();
+    setState(() {
+      _journalEntry = entryToday?.entry ?? '';
+    });
   }
 
   @override
@@ -88,7 +91,7 @@ class _HomePageState extends State<HomePage> {
                     borderRadius: BorderRadiusGeometry.circular(4),
                   ),
                   child: Padding(
-                    padding: EdgeInsets.all(10),
+                    padding: EdgeInsets.all(20),
                     child: Column(
                       children: [
                         Text(
@@ -108,7 +111,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               SizedBox(height: 50),
-              if (_mood == null)
+              if (_moodEntry == null)
                 Column(
                   children: [
                     Text(
@@ -126,7 +129,7 @@ class _HomePageState extends State<HomePage> {
                                 size: screenWidth / (Mood.values.length + 1),
                                 color: mood.color,
                               ),
-                              onPressed: () => _updateMood(mood),
+                              onPressed: () => _saveMood(mood),
                             ),
                             Text(
                               mood.label,
@@ -142,18 +145,18 @@ class _HomePageState extends State<HomePage> {
                 Column(
                   children: [
                     Icon(
-                      _mood!.icon,
+                      Mood.values.byName(_moodEntry!.mood).icon,
                       size: screenWidth / 4,
-                      color: _mood!.color,
+                      color: Mood.values.byName(_moodEntry!.mood).color,
                     ),
                     TextButton.icon(
                       label: Text(
-                        _mood!.label,
+                        Mood.values.byName(_moodEntry!.mood)!.label,
                         style: Theme.of(context).textTheme.bodySmall,
                       ),
                       icon: Icon(Icons.edit, color: MindfulnessTheme.softGray),
                       iconAlignment: IconAlignment.end,
-                      onPressed: () => _updateMood(null),
+                      onPressed: () => _deleteMood(),
                     ),
                   ],
                 ),
@@ -165,35 +168,48 @@ class _HomePageState extends State<HomePage> {
                     'Journal Entry:',
                     style: Theme.of(context).textTheme.titleSmall,
                   ),
-                  IconButton(
-                    onPressed: () {
-                      widget.tabController.animateTo(3);
-                    },
-                    icon: Icon(
-                      _journalEntry.isEmpty ? Icons.post_add : Icons.edit_note,
+                  if (_journalEntry.isNotEmpty)
+                    IconButton(
+                      onPressed: () {
+                        widget.tabController.animateTo(3);
+                      },
+                      icon: Icon(Icons.edit_note),
                     ),
-                  ),
                 ],
               ),
+              SizedBox(height: 20),
               if (_journalEntry.isEmpty)
-                Text(
-                  'No entry for today yet.',
-                  style: Theme.of(context).textTheme.bodySmall,
+                Column(
+                  children: [
+                    Text(
+                      'No entry for today yet. Add one.',
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        widget.tabController.animateTo(3);
+                      },
+                      icon: Icon(Icons.post_add),
+                      iconSize: 100,
+                      color: MindfulnessTheme.softGray,
+                    ),
+                  ],
                 )
               else
-                Container(
+                SizedBox(
                   width: double.infinity,
-                  height: 200,
-                  decoration: BoxDecoration(
-                    border: Border.all(),
-                    borderRadius: BorderRadius.all(Radius.circular(4)),
-                  ),
-                  child: SingleChildScrollView(
-                    child: Padding(
-                      padding: EdgeInsets.all(20),
-                      child: Text(
-                        _journalEntry,
-                        style: Theme.of(context).textTheme.bodySmall,
+                  child: Card(
+                    color: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadiusGeometry.circular(4),
+                    ),
+                    child: SingleChildScrollView(
+                      child: Padding(
+                        padding: EdgeInsets.all(20),
+                        child: Text(
+                          _journalEntry,
+                          style: Theme.of(context).textTheme.titleSmall,
+                        ),
                       ),
                     ),
                   ),

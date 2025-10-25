@@ -46,11 +46,11 @@ class _MoodPageState extends State<MoodPage> {
   }
 
   Future<void> _saveMood(Mood newMood) async {
-    MoodEntry newEntry = MoodEntry(
+    MoodEntry updatedMood = MoodEntry(
       date: DateTime.now().toUtc().toIso8601String(),
       mood: newMood.name,
     );
-    await _moodRepository.add(newEntry);
+    await _moodRepository.save(updatedMood);
     _loadMoodData();
   }
 
