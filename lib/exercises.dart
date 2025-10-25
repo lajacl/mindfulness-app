@@ -12,24 +12,25 @@ class ExercisesPage extends StatefulWidget {
 
 class _ExercisesPageState extends State<ExercisesPage>
     with TickerProviderStateMixin {
-  Map<String, String>? _selectedItem;
+  VideoExcercise? _selectedVideo;
+  TextExcercise? _selectedText;
   bool _videoSelected = false;
   bool _textSelected = false;
   final _playController = YoutubePlayerController();
   late final TabController _nestedController;
 
-  void _selectVideo(item) {
+  void _selectVideo(VideoExcercise item) {
     setState(() {
-      _selectedItem = item;
+      _selectedVideo = item;
       _textSelected = false;
       _videoSelected = true;
-      _playController.loadVideoById(videoId: item['videoId']);
+      _playController.loadVideoById(videoId: item.youtubeId);
     });
   }
 
-  void _selectText(item) {
+  void _selectText(TextExcercise item) {
     setState(() {
-      _selectedItem = item;
+      _selectedText = item;
       _playController.stopVideo();
       _videoSelected = false;
       _textSelected = true;
@@ -66,12 +67,12 @@ class _ExercisesPageState extends State<ExercisesPage>
                     child: Column(
                       children: [
                         Text(
-                          '${_selectedItem!['title']}',
+                          _selectedText!.title,
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
                         SizedBox(height: 10),
                         Text(
-                          _selectedItem!['text']!,
+                          _selectedText!.text,
                           style: Theme.of(context).textTheme.bodyMedium,
                         ),
                       ],
@@ -101,19 +102,19 @@ class _ExercisesPageState extends State<ExercisesPage>
                 child: ListView.builder(
                   itemCount: videoExercises.length,
                   itemBuilder: (context, index) {
+                    final videoExcercise = videoExercises[index];
                     return ListTile(
                       title: Text(
-                        videoExercises[index]["title"]!,
+                        videoExcercise.title,
                         style: Theme.of(context).textTheme.bodyLarge,
                       ),
                       trailing: Icon(
                         Icons.play_circle_outline,
                         color: MindfulnessTheme.mutedCoral,
                       ),
-                      onTap: () => _selectVideo(videoExercises[index]),
+                      onTap: () => _selectVideo(videoExcercise),
                       selected: _videoSelected
-                          ? videoExercises[index]['title'] ==
-                                _selectedItem!['title']
+                          ? videoExcercise.title == _selectedVideo?.title
                           : false,
                       selectedTileColor: MindfulnessTheme.softTeal,
                     );
@@ -124,19 +125,19 @@ class _ExercisesPageState extends State<ExercisesPage>
                 child: ListView.builder(
                   itemCount: textExercises.length,
                   itemBuilder: (context, index) {
+                    final textExercise = textExercises[index];
                     return ListTile(
                       title: Text(
-                        textExercises[index]["title"]!,
+                        textExercise.title,
                         style: Theme.of(context).textTheme.bodyLarge,
                       ),
                       trailing: Icon(
                         Icons.chevron_right,
                         color: MindfulnessTheme.mutedCoral,
                       ),
-                      onTap: () => _selectText(textExercises[index]),
+                      onTap: () => _selectText(textExercise),
                       selected: _textSelected
-                          ? textExercises[index]['title'] ==
-                                _selectedItem!['title']
+                          ? textExercise.title == _selectedVideo?.title
                           : false,
                       selectedTileColor: MindfulnessTheme.softTeal,
                     );
