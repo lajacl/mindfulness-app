@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:mindfulness_app/database/models/journal_entry.dart';
+import 'package:mindfulness_app/database/repositories/journal_repository.dart';
 import 'package:mindfulness_app/theme.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class JournalPage extends StatefulWidget {
   const JournalPage({super.key});
@@ -11,36 +12,55 @@ class JournalPage extends StatefulWidget {
 }
 
 class _JournalPageState extends State<JournalPage> {
-  late final TextEditingController _textController;
-  String _journalEntry = '';
+  final JournalRepository _journalRepository = JournalRepository();
+  final TextEditingController _textController = TextEditingController();
+  final PageController _pageController = PageController();
+  String _currentEntry = '';
+  List<JournalEntry> _entryList = [];
   bool _isEditing = false;
   bool _canSubmit = false;
 
-  String _getDate() {
-    DateTime datetime = DateTime.now();
-    return DateFormat('MMMM d, yyyy').format(datetime);
+  String _getFormattedDate(String entryDateTime) {
+    DateTime dateTime = DateTime.parse(entryDateTime);
+    return DateFormat('MMMM d, yyyy\nh:mm a').format(dateTime.toLocal());
   }
 
-  Future<void> _loadEntry() async {
-    final prefs = await SharedPreferences.getInstance();
-    // prefs.remove('journalEntry');
-    if (prefs.containsKey('journalEntry')) {
-      setState(() {
-        _textController.text = prefs.getString('journalEntry') ?? '';
-        _journalEntry = _textController.text;
-      });
-    }
-  }
-
-  Future<void> _saveEntry() async {
-    String trimmedText = _textController.text.trim();
-    if (trimmedText.isEmpty) return;
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setString('journalEntry', trimmedText);
-    setState(() {
-      _journalEntry = trimmedText;
+  Future<void> _loadJournalData() async {
+    List<JournalEntry> journalEntries = await _journalRepository
+        .getAllByDateDesc();
+    if (journalEntries.isEmpty ||
+        (journalEntries.isNotEmpty &&
+            !DateUtils.isSameDay(
+              DateTime.parse(journalEntries.first.date),
+              DateTime.now(),
+            ))) {
+      journalEntries.insert(
+        0,
+        JournalEntry(
+          id: null,
+          date: DateTime.now().toUtc().toIso8601String(),
+          entry: '',
+        ),
+      );
+      _isEditing = true;
+    } else {
       _isEditing = false;
+    }
+    setState(() {
+      _entryList = journalEntries;
     });
+  }
+
+  Future<void> _saveEntry(JournalEntry entry) async {
+    String trimmedText = _textController.text.trim();
+    if (trimmedText.isEmpty || (trimmedText == _currentEntry)) return;
+    JournalEntry updatedEntry = JournalEntry(
+      id: entry.id,
+      date: entry.date,
+      entry: trimmedText,
+    );
+    await _journalRepository.add(updatedEntry);
+    _loadJournalData();
   }
 
   void _editEntry() {
@@ -53,7 +73,7 @@ class _JournalPageState extends State<JournalPage> {
   void _cancelEdit() {
     setState(() {
       _isEditing = false;
-      _textController.text = _journalEntry;
+      _textController.text = _currentEntry;
     });
   }
 
@@ -66,7 +86,10 @@ class _JournalPageState extends State<JournalPage> {
     }
   }
 
-  Future<void> _showAlertDialog(BuildContext context) async {
+  Future<void> _showAlertDialog(
+    BuildContext context,
+    JournalEntry entry,
+  ) async {
     return showDialog(
       context: context,
       builder: (BuildContext dialogContext) {
@@ -84,7 +107,7 @@ class _JournalPageState extends State<JournalPage> {
             ),
             TextButton(
               onPressed: () {
-                _deleteEntry();
+                _deleteEntry(entry);
                 Navigator.of(dialogContext).pop();
               },
               child: const Text('Confirm'),
@@ -95,21 +118,18 @@ class _JournalPageState extends State<JournalPage> {
     );
   }
 
-  Future<void> _deleteEntry() async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.remove('journalEntry');
+  Future<void> _deleteEntry(JournalEntry entry) async {
+    await _journalRepository.deleteById(entry.id!);
     setState(() {
       _canSubmit = false;
-      _journalEntry = '';
-      _textController.text = _journalEntry;
     });
+    _loadJournalData();
   }
 
   @override
   void initState() {
     super.initState();
-    _textController = TextEditingController();
-    _loadEntry();
+    _loadJournalData();
   }
 
   @override
@@ -121,81 +141,138 @@ class _JournalPageState extends State<JournalPage> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          Text(
-            _getDate(),
-            style: Theme.of(context).textTheme.headlineLarge,
-            textAlign: TextAlign.center,
-          ),
-          SizedBox(height: 10),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Journal Entry:',
-                style: Theme.of(context).textTheme.titleSmall,
-              ),
-              if (_textController.text.isNotEmpty && !_isEditing)
-                IconButton(
-                  icon: Icon(Icons.edit),
-                  onPressed: () => _editEntry(),
-                ),
-            ],
-          ),
-          SizedBox(height: 10),
-          Column(
+      padding: EdgeInsets.symmetric(horizontal: 0, vertical: 20),
+      child: PageView.builder(
+        controller: _pageController,
+        reverse: true,
+        itemCount: _entryList.length,
+        itemBuilder: (BuildContext context, int index) {
+          _textController.text = _currentEntry = _entryList[index].entry;
+
+          return Column(
             mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  border: Border.all(),
-                  borderRadius: BorderRadius.all(Radius.circular(4)),
-                ),
-                child: Padding(
-                  padding: EdgeInsets.all(20),
-                  child: EditableText(
-                    minLines: 5,
-                    maxLines: 20,
-                    controller: _textController,
-                    focusNode: FocusNode(),
-                    style: TextStyle(color: Colors.black),
-                    cursorColor: Colors.tealAccent,
-                    backgroundCursorColor: Colors.grey,
-                    readOnly: _textController.text.isNotEmpty && !_isEditing,
-                    onChanged: (value) => _onTextChanged(value),
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  IconButton(
+                    onPressed: index < (_entryList.length - 1)
+                        ? () => _pageController.nextPage(
+                            duration: Duration(milliseconds: 250),
+                            curve: Curves.linear,
+                          )
+                        : null,
+                    icon: Icon(Icons.arrow_circle_left, size: 50),
+                    color: index < (_entryList.length - 1)
+                        ? MindfulnessTheme.softTeal
+                        : MindfulnessTheme.softGray,
                   ),
-                ),
+                  Text(
+                    _getFormattedDate(_entryList[index].date),
+                    style: Theme.of(context).textTheme.headlineLarge,
+                    textAlign: TextAlign.center,
+                  ),
+                  IconButton(
+                    onPressed: index > 0
+                        ? () => _pageController.previousPage(
+                            duration: Duration(milliseconds: 250),
+                            curve: Curves.linear,
+                          )
+                        : null,
+                    icon: Icon(
+                      Icons.arrow_circle_right,
+                      size: 50,
+                      color: index > 0
+                          ? MindfulnessTheme.softTeal
+                          : MindfulnessTheme.softGray,
+                    ),
+                  ),
+                ],
               ),
-              SizedBox(height: 20),
-              if (_textController.text.isEmpty || _isEditing)
-                Row(
-                  mainAxisAlignment: _journalEntry.isNotEmpty
-                      ? MainAxisAlignment.spaceBetween
-                      : MainAxisAlignment.end,
+              SizedBox(height: 10),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                child: Column(
                   children: [
-                    if (_journalEntry.isNotEmpty)
-                      TextButton(onPressed: _cancelEdit, child: Text('Cancel')),
-                    ElevatedButton(
-                      onPressed: _canSubmit ? () => _saveEntry() : null,
-                      child: Text('Save'),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Journal Entry:',
+                          style: Theme.of(context).textTheme.titleSmall,
+                        ),
+                        if (_textController.text.isNotEmpty && !_isEditing)
+                          IconButton(
+                            icon: Icon(Icons.edit),
+                            onPressed: () => _editEntry(),
+                          ),
+                      ],
+                    ),
+                    SizedBox(height: 10),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(),
+                            borderRadius: BorderRadius.all(Radius.circular(4)),
+                          ),
+                          child: Padding(
+                            padding: EdgeInsets.all(20),
+                            child: EditableText(
+                              minLines: 5,
+                              maxLines: 20,
+                              controller: _textController,
+                              focusNode: FocusNode(),
+                              style: TextStyle(color: Colors.black),
+                              cursorColor: Colors.tealAccent,
+                              backgroundCursorColor: Colors.grey,
+                              readOnly:
+                                  _textController.text.isNotEmpty &&
+                                  !_isEditing,
+                              onChanged: (value) => _onTextChanged(value),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 20),
+                        if (_textController.text.isEmpty || _isEditing)
+                          Row(
+                            mainAxisAlignment:
+                                _entryList[index].entry.isNotEmpty
+                                ? MainAxisAlignment.spaceBetween
+                                : MainAxisAlignment.end,
+                            children: [
+                              if (_entryList[index].entry.isNotEmpty)
+                                TextButton(
+                                  onPressed: _cancelEdit,
+                                  child: Text('Cancel'),
+                                ),
+                              ElevatedButton(
+                                onPressed: _canSubmit
+                                    ? () => _saveEntry(_entryList[index])
+                                    : null,
+                                child: Text('Save'),
+                              ),
+                            ],
+                          )
+                        else
+                          Align(
+                            alignment: AlignmentGeometry.bottomLeft,
+                            child: TextButton(
+                              onPressed: () =>
+                                  _showAlertDialog(context, _entryList[index]),
+                              child: Text('Delete'),
+                            ),
+                          ),
+                      ],
                     ),
                   ],
-                )
-              else
-                Align(
-                  alignment: AlignmentGeometry.bottomLeft,
-                  child: TextButton(
-                    onPressed: () => _showAlertDialog(context),
-                    child: Text('Delete'),
-                  ),
                 ),
+              ),
             ],
-          ),
-        ],
+          );
+        },
       ),
     );
   }

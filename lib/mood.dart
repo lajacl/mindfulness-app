@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:mindfulness_app/data.dart';
+import 'package:mindfulness_app/database/models/mood_entry.dart';
 import 'package:mindfulness_app/database/repositories/mood_history_repository.dart';
 import 'package:mindfulness_app/theme.dart';
-
-import 'database/models/mood_entry.dart';
 
 class MoodPage extends StatefulWidget {
   const MoodPage({super.key});
@@ -19,23 +18,9 @@ class _MoodPageState extends State<MoodPage> {
   MoodEntry? _currentMood;
   List<MoodEntry> _moodHistory = [];
 
-  String _getDate() {
+  String _getDateToday() {
     DateTime datetime = DateTime.now();
     return DateFormat('MMMM d, yyyy').format(datetime);
-  }
-
-  Future<void> _updateMood(Mood? newMood) async {
-    if (newMood == null) {
-      await _moodRepository.deleteById(_currentMood!.id!);
-      _currentMood = null;
-    } else {
-      MoodEntry nowMood = MoodEntry(
-        date: DateTime.now().toUtc().toIso8601String(),
-        mood: newMood.name,
-      );
-      await _moodRepository.add(nowMood);
-    }
-    _loadMoodData();
   }
 
   Future<void> _loadMoodData() async {
@@ -47,6 +32,8 @@ class _MoodPageState extends State<MoodPage> {
         )) {
       _currentMood = moodEntries.first;
       moodEntries.removeAt(0);
+    } else {
+      _currentMood = null;
     }
     setState(() {
       _moodHistory = moodEntries;
@@ -56,6 +43,20 @@ class _MoodPageState extends State<MoodPage> {
   String _getFormattedDate(String entryDateTime) {
     DateTime dateTime = DateTime.parse(entryDateTime);
     return DateFormat('EEEE, MMMM d, yyyy h:mm a').format(dateTime.toLocal());
+  }
+
+  Future<void> _saveMood(Mood newMood) async {
+    MoodEntry newEntry = MoodEntry(
+      date: DateTime.now().toUtc().toIso8601String(),
+      mood: newMood.name,
+    );
+    await _moodRepository.add(newEntry);
+    _loadMoodData();
+  }
+
+  Future<void> _deleteMood() async {
+    await _moodRepository.deleteById(_currentMood!.id!);
+    _loadMoodData();
   }
 
   @override
@@ -74,7 +75,10 @@ class _MoodPageState extends State<MoodPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
-          Text(_getDate(), style: Theme.of(context).textTheme.headlineLarge),
+          Text(
+            _getDateToday(),
+            style: Theme.of(context).textTheme.headlineLarge,
+          ),
           SizedBox(height: 10),
           if (_currentMood == null)
             Column(
@@ -94,7 +98,7 @@ class _MoodPageState extends State<MoodPage> {
                             size: screenWidth / (Mood.values.length + 1),
                             color: mood.color,
                           ),
-                          onPressed: () => _updateMood(mood),
+                          onPressed: () => _saveMood(mood),
                         ),
                         Text(
                           mood.label,
@@ -121,7 +125,7 @@ class _MoodPageState extends State<MoodPage> {
                   ),
                   icon: Icon(Icons.edit, color: MindfulnessTheme.softGray),
                   iconAlignment: IconAlignment.end,
-                  onPressed: () => _updateMood(null),
+                  onPressed: () => _deleteMood(),
                 ),
               ],
             ),
