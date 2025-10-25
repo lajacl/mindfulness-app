@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mindfulness_app/data.dart';
@@ -6,6 +8,7 @@ import 'package:mindfulness_app/database/models/mood_entry.dart';
 import 'package:mindfulness_app/database/repositories/journal_repository.dart';
 import 'package:mindfulness_app/database/repositories/mood_history_repository.dart';
 import 'package:mindfulness_app/theme.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
   final TabController tabController;
@@ -18,17 +21,41 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final MoodHistoryRepository _moodRepository = MoodHistoryRepository();
   final JournalRepository _journalRepository = JournalRepository();
-  final Map<String, String> _message = {
-    'text':
-        'God has not given me a spirit of fear, but of power and of love and of a sound mind.',
-    'verse': '2 Timothy 1:7',
-  };
+  Quote _quote = Quote(text: "", source: "");
   MoodEntry? _moodEntry;
   String _journalEntry = '';
 
   String _getDate() {
     DateTime datetime = DateTime.now();
     return DateFormat('MMMM d, yyyy').format(datetime);
+  }
+
+  Future<void> _setQuote() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    if (prefs.containsKey("quoteDate")) {
+      String lastQuoteDate = prefs.getString("quoteDate")!;
+      if (DateUtils.isSameDay(DateTime.parse(lastQuoteDate), DateTime.now())) {
+        setState(() {
+          _quote = quotes[prefs.getInt("quoteIndex")!];
+        });
+      } else {
+        selectQuote(prefs);
+      }
+    } else {
+      selectQuote(prefs);
+    }
+  }
+
+  Future<void> selectQuote(SharedPreferences prefs) async {
+    int quoteIndex = Random().nextInt(quotes.length);
+    await prefs.setInt("quoteIndex", quoteIndex);
+    await prefs.setString(
+      "quoteDate",
+      DateTime.now().toUtc().toIso8601String(),
+    );
+    setState(() {
+      _quote = quotes[quoteIndex];
+    });
   }
 
   Future<void> _loadMood() async {
@@ -63,6 +90,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    _setQuote();
     _loadMood();
     _loadJournalEntry();
   }
@@ -94,14 +122,17 @@ class _HomePageState extends State<HomePage> {
                     padding: EdgeInsets.all(20),
                     child: Column(
                       children: [
-                        Text(
-                          _message['text']!,
-                          style: Theme.of(context).textTheme.bodyMedium,
+                        Align(
+                          alignment: AlignmentGeometry.topLeft,
+                          child: Text(
+                            _quote.text,
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
                         ),
                         Align(
                           alignment: AlignmentGeometry.bottomRight,
                           child: Text(
-                            _message['verse']!,
+                            '- ${_quote.source}',
                             style: Theme.of(context).textTheme.titleSmall,
                           ),
                         ),
