@@ -208,3 +208,25 @@ const List<TextExcercise> textExercises = [
         "When you are ready to finish the exercise, open your eyes slowly and try to carry that mindfulness with you as you go about your day.",
   ),
 ];
+
+const soundFiles = [
+  "ocean_waves.mp3",
+  "birds_singing.mp3",
+  "rainfall.mp3",
+  "white_noise.mp3",
+  "babbling_brook.mp3",
+  "crickets.mp3",
+  "waterfall.mp3",
+  "leaves_rustling.mp3",
+  "river_flowing.mp3",
+  "brown_noise.mp3",
+  "rain_thunder.mp3",
+  "computer_hum.mp3",
+];
+
+const musicFiles = [
+  "calm_meditation.mp3",
+  "mindfulness_meditation.mp3",
+  "soothing_drone.mp3",
+  "healing_ringing.mp3",
+];

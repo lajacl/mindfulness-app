@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mindfulness_app/audio.dart';
 import 'package:mindfulness_app/exercises.dart';
 import 'package:mindfulness_app/home.dart';
 import 'package:mindfulness_app/journal.dart';
@@ -75,7 +76,7 @@ class _MainPageState extends State<MainPage>
             ExercisesPage(),
             MoodPage(),
             JournalPage(),
-            Tab(icon: Icon(Icons.music_note, size: 200)),
+            AudioPage(),
           ],
         ),
       ),
