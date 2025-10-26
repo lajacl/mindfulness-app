@@ -11,8 +11,8 @@ import 'package:mindfulness_app/theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
-  final TabController tabController;
-  const HomePage({super.key, required this.tabController});
+  final Function(int index) goToPage;
+  const HomePage({super.key, required void Function(int index) this.goToPage});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -202,7 +202,7 @@ class _HomePageState extends State<HomePage> {
                   if (_journalEntry.isNotEmpty)
                     IconButton(
                       onPressed: () {
-                        widget.tabController.animateTo(3);
+                        widget.goToPage(3);
                       },
                       icon: Icon(Icons.edit_note),
                     ),
@@ -218,7 +218,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                     IconButton(
                       onPressed: () {
-                        widget.tabController.animateTo(3);
+                        widget.goToPage(3);
                       },
                       icon: Icon(Icons.post_add),
                       iconSize: 100,
