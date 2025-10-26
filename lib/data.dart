@@ -92,6 +92,7 @@ const List<VideoExcercise> videoExercises = [
   VideoExcercise(title: "Impermanence", youtubeId: "uumInvT4t9Y"),
   VideoExcercise(title: "Santosha", youtubeId: "5vI8Kh3-epg"),
   VideoExcercise(title: "Present", youtubeId: "lVx3mFxML80"),
+  VideoExcercise(title: "Community", youtubeId: "F0CbKoWOors"),
   VideoExcercise(
     title: "A 5 Minute Mindfulness Meditation",
     youtubeId: "wGFog-OuFDM",
@@ -229,7 +230,7 @@ const musicFiles = [
   "mindfulness_meditation.mp3",
   "soothing_drone.mp3",
   "healing_ringing.mp3",
-  "spring_breezespring_breeze.mp3",
+  "spring_breeze.mp3",
   "muse_flight.mp3",
   "autumn_flight.mp3",
   "warm_day.mp3",
