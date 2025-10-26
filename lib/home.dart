@@ -175,14 +175,22 @@ class _HomePageState extends State<HomePage> {
               else
                 Column(
                   children: [
-                    Icon(
-                      Mood.values.byName(_moodEntry!.mood).icon,
-                      size: screenWidth / 4,
-                      color: Mood.values.byName(_moodEntry!.mood).color,
+                    Hero(
+                      tag: 'mood',
+                      child: IconButton(
+                        iconSize: screenWidth / 4,
+                        color: Mood.values.byName(_moodEntry!.mood).color,
+                        onPressed: (() {
+                          setState(() {
+                            widget.goToPage(2);
+                          });
+                        }),
+                        icon: Icon(Mood.values.byName(_moodEntry!.mood).icon),
+                      ),
                     ),
                     TextButton.icon(
                       label: Text(
-                        Mood.values.byName(_moodEntry!.mood)!.label,
+                        Mood.values.byName(_moodEntry!.mood).label,
                         style: Theme.of(context).textTheme.bodySmall,
                       ),
                       icon: Icon(Icons.edit, color: MindfulnessTheme.softGray),

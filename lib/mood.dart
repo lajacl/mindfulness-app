@@ -134,10 +134,13 @@ class _MoodPageState extends State<MoodPage> {
           else
             Column(
               children: [
-                Icon(
-                  Mood.values.byName(_currentMood!.mood).icon,
-                  size: screenWidth / 4,
-                  color: Mood.values.byName(_currentMood!.mood).color,
+                Hero(
+                  tag: 'mood',
+                  child: Icon(
+                    Mood.values.byName(_currentMood!.mood).icon,
+                    size: screenWidth / 4,
+                    color: Mood.values.byName(_currentMood!.mood).color,
+                  ),
                 ),
                 TextButton.icon(
                   label: Text(
