@@ -14,7 +14,6 @@ class _ExercisesPageState extends State<ExercisesPage>
     with TickerProviderStateMixin {
   late final TabController _nestedTabsController;
   late final YoutubePlayerController _playerController;
-
   VideoExcercise? _selectedVideo;
   TextExcercise? _selectedText;
   bool _videoSelected = false;
@@ -50,6 +49,7 @@ class _ExercisesPageState extends State<ExercisesPage>
   @override
   void dispose() {
     _nestedTabsController.dispose();
+    _playerController.dispose();
     super.dispose();
   }
 
