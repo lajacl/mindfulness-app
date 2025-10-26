@@ -4,6 +4,7 @@ import 'package:mindfulness_app/exercises.dart';
 import 'package:mindfulness_app/home.dart';
 import 'package:mindfulness_app/journal.dart';
 import 'package:mindfulness_app/mood.dart';
+import 'package:mindfulness_app/splash_screen.dart';
 import 'package:mindfulness_app/theme.dart';
 
 void main() {
@@ -18,7 +19,7 @@ class MindfulnessApp extends StatelessWidget {
     return MaterialApp(
       title: 'Mindfulness App',
       theme: MindfulnessTheme.theme,
-      home: const MainPage(title: 'Mindful Me'),
+      home: const SplashScreen(),
       debugShowCheckedModeBanner: false,
     );
   }
