@@ -5,6 +5,7 @@ import 'package:mindfulness_app/data.dart';
 import 'package:mindfulness_app/database/models/mood_entry.dart';
 import 'package:mindfulness_app/database/repositories/mood_history_repository.dart';
 import 'package:mindfulness_app/theme.dart';
+import 'package:pie_chart/pie_chart.dart';
 
 class MoodPage extends StatefulWidget {
   const MoodPage({super.key});
@@ -17,6 +18,7 @@ class _MoodPageState extends State<MoodPage> {
   final MoodHistoryRepository _moodRepository = MoodHistoryRepository();
   MoodEntry? _currentMood;
   List<MoodEntry> _moodHistory = [];
+  List<Map<String, dynamic>> _countMapList = [];
 
   String _getDateToday() {
     DateTime datetime = DateTime.now();
@@ -59,11 +61,30 @@ class _MoodPageState extends State<MoodPage> {
     _loadMoodData();
   }
 
+  Future<void> _loadChartData() async {
+    _countMapList = await _moodRepository.getCountByMood();
+  }
+
+  Map<String, double> _buildPieChart() {
+    Map<String, double> countMap = {};
+    for (var mood in Mood.values) {
+      for (var item in _countMapList) {
+        if (item['mood'] == mood.name) {
+          countMap['${mood.name} (${item['count']})'] = item['count']
+              .toDouble();
+          break;
+        }
+      }
+    }
+    return countMap;
+  }
+
   @override
   void initState() {
     super.initState();
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     _loadMoodData();
+    _loadChartData();
   }
 
   @override
@@ -129,9 +150,23 @@ class _MoodPageState extends State<MoodPage> {
                 ),
               ],
             ),
-          SizedBox(height: 50),
+          SizedBox(height: 30),
           Text('History', style: Theme.of(context).textTheme.titleMedium),
-          SizedBox(height: 8),
+          if (_countMapList.isNotEmpty)
+            PieChart(
+              dataMap: _buildPieChart(),
+              chartLegendSpacing: 20,
+              chartRadius: screenWidth / 3,
+              colorList: [
+                MindfulnessTheme.softTeal,
+                MindfulnessTheme.skyBlue,
+                MindfulnessTheme.mutedCoral,
+              ],
+              chartValuesOptions: ChartValuesOptions(
+                showChartValuesInPercentage: true,
+              ),
+            ),
+          SizedBox(height: 10),
           Expanded(
             child: _moodHistory.isNotEmpty
                 ? Container(

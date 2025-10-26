@@ -29,6 +29,14 @@ class MoodHistoryRepository {
     return result.isNotEmpty ? MoodEntry.fromMap(result.first) : null;
   }
 
+  Future<List<Map<String, dynamic>>> getCountByMood() async {
+    final db = await dbHelper.database;
+    final List<Map<String, dynamic>> result = await db.rawQuery(
+      'SELECT mood, COUNT(*) AS count FROM $tableName GROUP BY mood ORDER BY mood',
+    );
+    return result;
+  }
+
   Future<int> save(MoodEntry entry) async {
     final db = await dbHelper.database;
     return await db.insert(
