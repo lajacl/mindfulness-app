@@ -29,7 +29,7 @@ class _MoodPageState extends State<MoodPage> {
     List<MoodEntry> moodEntries = await _moodRepository.getAllByDateDesc();
     if (moodEntries.isNotEmpty &&
         DateUtils.isSameDay(
-          DateTime.parse(moodEntries.first.date),
+          DateTime.parse(moodEntries.first.date).toLocal(),
           DateTime.now(),
         )) {
       _currentMood = moodEntries.first;

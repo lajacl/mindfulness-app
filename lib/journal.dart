@@ -32,7 +32,7 @@ class _JournalPageState extends State<JournalPage> {
     if (journalEntries.isEmpty ||
         (journalEntries.isNotEmpty &&
             !DateUtils.isSameDay(
-              DateTime.parse(journalEntries.first.date),
+              DateTime.parse(journalEntries.first.date).toLocal(),
               DateTime.now(),
             ))) {
       journalEntries.insert(

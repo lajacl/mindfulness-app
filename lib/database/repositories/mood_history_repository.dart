@@ -19,11 +19,12 @@ class MoodHistoryRepository {
   }
 
   Future<MoodEntry?> getFirstWhereDateToday() async {
+    String nowUtc = DateTime.now().toUtc().toIso8601String();
     final db = await dbHelper.database;
     final result = await db.query(
       tableName,
       where: 'date(date) = date(?)',
-      whereArgs: ['now'],
+      whereArgs: [nowUtc],
       limit: 1,
     );
     return result.isNotEmpty ? MoodEntry.fromMap(result.first) : null;
