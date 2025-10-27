@@ -24,7 +24,7 @@ class _ExercisesPageState extends State<ExercisesPage>
       _selectedVideo = item;
       _textSelected = false;
       _videoSelected = true;
-      _playerController.load(item.youtubeId);
+      _playerController.load(item.youtubeId, startAt: 10);
     });
   }
 
@@ -43,6 +43,7 @@ class _ExercisesPageState extends State<ExercisesPage>
     _nestedTabsController = TabController(length: 2, vsync: this);
     _playerController = YoutubePlayerController(
       initialVideoId: videoExercises[0].youtubeId,
+      flags: const YoutubePlayerFlags(startAt: 10, autoPlay: true, mute: false),
     );
   }
 
