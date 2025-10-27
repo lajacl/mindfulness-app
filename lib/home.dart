@@ -221,7 +221,7 @@ class _HomePageState extends State<HomePage> {
                 Column(
                   children: [
                     Text(
-                      'No entry for today yet. Add one.',
+                      'No entry for today yet.\nAdd your thoughts and reflections.',
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                     IconButton(
