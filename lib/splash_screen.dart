@@ -12,11 +12,11 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  double _scale = 0.75;
+  double _opacity = 0;
 
-  void _toggleScale() {
+  void _animate() {
     setState(() {
-      _scale = 1;
+      _opacity = 1;
     });
   }
 
@@ -24,7 +24,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     Timer(Duration(milliseconds: 250), () {
-      _toggleScale();
+      _animate();
     });
     Timer(Duration(seconds: 2), () {
       Navigator.of(context).pushReplacement(
@@ -41,9 +41,9 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            AnimatedScale(
-              scale: _scale,
-              duration: const Duration(milliseconds: 500),
+            AnimatedOpacity(
+              opacity: _opacity,
+              duration: const Duration(seconds: 1),
               curve: Curves.easeOut,
               child: Text(
                 'Mindful\nMe',
