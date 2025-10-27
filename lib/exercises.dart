@@ -70,12 +70,12 @@ class _ExercisesPageState extends State<ExercisesPage>
                   child: Padding(
                     padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                     child: Column(
+                      spacing: 10,
                       children: [
                         Text(
                           _selectedText!.title,
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
-                        SizedBox(height: 10),
                         Text(
                           _selectedText!.text,
                           style: Theme.of(context).textTheme.bodyMedium,

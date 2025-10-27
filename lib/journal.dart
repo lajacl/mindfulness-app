@@ -217,6 +217,7 @@ class _JournalPageState extends State<JournalPage> {
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
                 child: Column(
+                  spacing: 10,
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -235,7 +236,6 @@ class _JournalPageState extends State<JournalPage> {
                           ),
                       ],
                     ),
-                    SizedBox(height: 10),
                     Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [

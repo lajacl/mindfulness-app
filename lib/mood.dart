@@ -95,12 +95,12 @@ class _MoodPageState extends State<MoodPage> {
       padding: EdgeInsets.only(top: 20),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
+        spacing: 10,
         children: <Widget>[
           Text(
             _getDateToday(),
             style: Theme.of(context).textTheme.headlineLarge,
           ),
-          SizedBox(height: 10),
           if (_currentMood == null)
             Column(
               children: [
